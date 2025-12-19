@@ -1,40 +1,40 @@
-import { defineConfig } from 'vite';
-import viteCompression from 'vite-plugin-compression';
+import { defineConfig } from "vite";
+import viteCompression from "vite-plugin-compression";
 
 export default defineConfig({
-  base: './',
+  base: "./",
   plugins: [
-    viteCompression({
-      algorithm: 'gzip',
-      ext: '.gz',
-      threshold: 1024,
-      deleteOriginFile: false
-    })
+    // viteCompression({
+    //   algorithm: 'gzip',
+    //   ext: '.gz',
+    //   threshold: 1024,
+    //   deleteOriginFile: false
+    // })
   ],
   server: {
     port: 3000,
-    open: true
+    open: true,
   },
   build: {
-    outDir: 'dist',
+    outDir: "dist",
     assetsInlineLimit: 4096,
-    minify: 'terser',
+    minify: "terser",
     terserOptions: {
       compress: {
         drop_console: true,
         drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info']
+        pure_funcs: ["console.log", "console.info"],
       },
-      mangle: true
+      mangle: true,
     },
     rollupOptions: {
       output: {
         manualChunks: {
-          phaser: ['phaser']
-        }
-      }
+          phaser: ["phaser"],
+        },
+      },
     },
     reportCompressedSize: true,
-    chunkSizeWarningLimit: 1500
-  }
+    chunkSizeWarningLimit: 1500,
+  },
 });
