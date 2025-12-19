@@ -23,7 +23,14 @@
       "Bash(find dist -type f ! -name \"*.gz\" -exec ls -lh {} ;)",
       "Bash(find dist -type f -name \"*.gz\" -exec ls -lh {} ;)",
       "Bash(git init)",
-      "Bash(git add .)"
+      "Bash(git add .)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nInitial commit: Wonder Room H5 儿童认知训练游戏\n\n- 两个游戏场景：影子侦探\\(Shadow Safari\\)和小小导演\\(Story Blocks\\)\n- 使用 Phaser 3 + TypeScript + Vite 构建\n- 包含动物和UI图片资源\n- 已优化打包配置（terser压缩、gzip预压缩）\nEOF\n\\)\")",
+      "Bash(git branch:*)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)",
+      "Bash(vercel --yes --prod)",
+      "Bash(vercel --name wonderroom-h5 --yes --prod)",
+      "Bash(git commit -m \"Add Vercel configuration\")"
     ]
   }
 }
