@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(cat /tmp/claude/-Users-zhuang-Desktop-AI-Project-WonderRoomH5-2/tasks/b33aa29.output)",
+      "WebSearch",
+      "WebFetch(domain:kenney.nl)",
+      "WebFetch(domain:opengameart.org)",
+      "WebFetch(domain:itch.io)",
+      "Bash(curl:*)",
+      "Bash(unzip -o ui-pack.zip -d ui_temp)",
+      "Bash(unzip -o penguin.zip -d penguin_temp)",
+      "Bash(xargs -I{} cp {} animals/penguin.png)",
+      "Bash(unzip -o duck.zip -d duck_temp)",
+      "Bash(xargs:*)",
+      "Bash(unzip:*)",
+      "Bash(npm run build:*)",
+      "Bash(find dist -type f -exec ls -lh {} ;)",
+      "Bash(find . -type f -name \"*.png\" -exec ls -lh {} ;)",
+      "Bash(npm install:*)",
+      "Bash(npm uninstall vite-plugin-imagemin)",
+      "Bash(find dist -type f ! -name \"*.gz\" -exec ls -lh {} ;)",
+      "Bash(find dist -type f -name \"*.gz\" -exec ls -lh {} ;)",
+      "Bash(git init)",
+      "Bash(git add .)"
+    ]
+  }
+}
