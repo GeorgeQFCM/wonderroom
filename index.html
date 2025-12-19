@@ -2,9 +2,14 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
+  <meta name="screen-orientation" content="landscape">
+  <meta name="x5-orientation" content="landscape">
+  <meta name="x5-fullscreen" content="true">
+  <meta name="full-screen" content="yes">
   <title>Wonder Room - 奇妙探索屋</title>
   <style>
     * {
@@ -21,6 +26,9 @@
       -webkit-touch-callout: none;
       -webkit-user-select: none;
       user-select: none;
+      position: fixed;
+      top: 0;
+      left: 0;
     }
     #game-container {
       width: 100%;
@@ -28,13 +36,107 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      position: absolute;
+      top: 0;
+      left: 0;
     }
     canvas {
       display: block;
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    /* 横屏提示遮罩 */
+    #rotate-prompt {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: white;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei", sans-serif;
+    }
+    #rotate-prompt .phone-icon {
+      width: 80px;
+      height: 120px;
+      border: 4px solid white;
+      border-radius: 12px;
+      position: relative;
+      animation: rotate-phone 1.5s ease-in-out infinite;
+      margin-bottom: 30px;
+    }
+    #rotate-prompt .phone-icon::before {
+      content: '';
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 4px;
+      background: white;
+      border-radius: 2px;
+    }
+    #rotate-prompt .phone-icon::after {
+      content: '';
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 24px;
+      height: 24px;
+      border: 3px solid white;
+      border-radius: 50%;
+    }
+    @keyframes rotate-phone {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(90deg); }
+    }
+    #rotate-prompt .text {
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    #rotate-prompt .subtext {
+      font-size: 16px;
+      margin-top: 10px;
+      opacity: 0.8;
+    }
+
+    /* 在竖屏时显示提示 */
+    @media screen and (orientation: portrait) {
+      #rotate-prompt {
+        display: flex;
+      }
+      #game-container {
+        display: none;
+      }
+    }
+    @media screen and (orientation: landscape) {
+      #rotate-prompt {
+        display: none !important;
+      }
+      #game-container {
+        display: flex;
+      }
     }
   </style>
 </head>
 <body>
+  <!-- 横屏提示 -->
+  <div id="rotate-prompt">
+    <div class="phone-icon"></div>
+    <div class="text">请将手机横过来</div>
+    <div class="subtext">获得最佳游戏体验</div>
+  </div>
+
+  <!-- 游戏容器 -->
   <div id="game-container"></div>
   <script type="module" src="/src/main.ts"></script>
 </body>
