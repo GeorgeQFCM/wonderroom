@@ -31,7 +31,10 @@
       "Bash(vercel --yes --prod)",
       "Bash(vercel --name wonderroom-h5 --yes --prod)",
       "Bash(git commit -m \"Add Vercel configuration\")",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(npx cap init \"Wonder Room\" \"com.wonderroom.app\" --web-dir dist)",
+      "Bash(npm uninstall @capacitor/core @capacitor/cli @capacitor/android)",
+      "Bash(npx cap add android)"
     ]
   }
 }

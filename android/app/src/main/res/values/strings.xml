@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Wonder Room</string>
+    <string name="title_activity_main">Wonder Room</string>
+    <string name="package_name">com.wonderroom.app</string>
+    <string name="custom_url_scheme">com.wonderroom.app</string>
+</resources>
