@@ -219,6 +219,66 @@ const STORY_IMAGES: Record<string, Record<string, string>> = {
     launch: 'story_rocket_launch',
     space: 'story_rocket_space',
     planet: 'story_rocket_planet'
+  },
+  // ===== 额外主题 =====
+  flower: {
+    seed: 'story_flower_seed',
+    sprout: 'story_flower_sprout',
+    flower: 'story_flower_flower'
+  },
+  day: {
+    sunrise: 'story_day_sunrise',
+    sun: 'story_day_sun',
+    sunset: 'story_day_sunset'
+  },
+  rain: {
+    cloud: 'story_rain_cloud',
+    rain: 'story_rain_rain',
+    rainbow: 'story_rain_rainbow'
+  },
+  tree: {
+    seed2: 'story_tree_seed',
+    sapling: 'story_tree_sapling',
+    small_tree: 'story_tree_small',
+    big_tree: 'story_tree_big'
+  },
+  snowman: {
+    snow: 'story_snowman_snow',
+    ball1: 'story_snowman_ball1',
+    ball2: 'story_snowman_ball2',
+    snowman: 'story_snowman_snowman'
+  },
+  house: {
+    foundation: 'story_house_foundation',
+    walls: 'story_house_walls',
+    roof: 'story_house_roof',
+    house: 'story_house_house'
+  },
+  moon: {
+    new_moon: 'story_moon_new',
+    crescent: 'story_moon_crescent',
+    half: 'story_moon_half',
+    full_moon: 'story_moon_full'
+  },
+  painting: {
+    canvas: 'story_painting_canvas',
+    sketch: 'story_painting_sketch',
+    color: 'story_painting_color',
+    art: 'story_painting_art'
+  },
+  star_life: {
+    nebula: 'story_star_nebula',
+    protostar: 'story_star_protostar',
+    star: 'story_star_star',
+    red_giant: 'story_star_red_giant',
+    supernova: 'story_star_supernova'
+  },
+  water_cycle: {
+    ocean: 'story_water_ocean',
+    evaporate: 'story_water_evaporate',
+    cloud2: 'story_water_cloud',
+    rain2: 'story_water_rain',
+    river: 'story_water_river'
   }
 };
 

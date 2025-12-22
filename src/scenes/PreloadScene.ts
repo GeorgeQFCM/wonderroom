@@ -120,6 +120,66 @@ export class PreloadScene extends Phaser.Scene {
     this.load.image('story_rocket_launch', 'assets/story/rocket/launch.png');
     this.load.image('story_rocket_space', 'assets/story/rocket/space.png');
     this.load.image('story_rocket_planet', 'assets/story/rocket/planet.png');
+
+    // ===== 额外主题图片资源 =====
+    // 花朵生长
+    this.load.image('story_flower_seed', 'assets/story/flower/seed.png');
+    this.load.image('story_flower_sprout', 'assets/story/flower/sprout.png');
+    this.load.image('story_flower_flower', 'assets/story/flower/flower.png');
+
+    // 日出日落
+    this.load.image('story_day_sunrise', 'assets/story/day/sunrise.png');
+    this.load.image('story_day_sun', 'assets/story/day/sun.png');
+    this.load.image('story_day_sunset', 'assets/story/day/sunset.png');
+
+    // 下雨彩虹
+    this.load.image('story_rain_cloud', 'assets/story/rain/cloud.png');
+    this.load.image('story_rain_rain', 'assets/story/rain/rain.png');
+    this.load.image('story_rain_rainbow', 'assets/story/rain/rainbow.png');
+
+    // 树木生长
+    this.load.image('story_tree_seed', 'assets/story/tree/seed.png');
+    this.load.image('story_tree_sapling', 'assets/story/tree/sapling.png');
+    this.load.image('story_tree_small', 'assets/story/tree/small_tree.png');
+    this.load.image('story_tree_big', 'assets/story/tree/big_tree.png');
+
+    // 雪人
+    this.load.image('story_snowman_snow', 'assets/story/snowman/snow.png');
+    this.load.image('story_snowman_ball1', 'assets/story/snowman/ball1.png');
+    this.load.image('story_snowman_ball2', 'assets/story/snowman/ball2.png');
+    this.load.image('story_snowman_snowman', 'assets/story/snowman/snowman.png');
+
+    // 房屋建造
+    this.load.image('story_house_foundation', 'assets/story/house/foundation.png');
+    this.load.image('story_house_walls', 'assets/story/house/walls.png');
+    this.load.image('story_house_roof', 'assets/story/house/roof.png');
+    this.load.image('story_house_house', 'assets/story/house/house.png');
+
+    // 月相变化
+    this.load.image('story_moon_new', 'assets/story/moon/new_moon.png');
+    this.load.image('story_moon_crescent', 'assets/story/moon/crescent.png');
+    this.load.image('story_moon_half', 'assets/story/moon/half.png');
+    this.load.image('story_moon_full', 'assets/story/moon/full_moon.png');
+
+    // 画画
+    this.load.image('story_painting_canvas', 'assets/story/painting/canvas.png');
+    this.load.image('story_painting_sketch', 'assets/story/painting/sketch.png');
+    this.load.image('story_painting_color', 'assets/story/painting/color.png');
+    this.load.image('story_painting_art', 'assets/story/painting/art.png');
+
+    // 恒星生命
+    this.load.image('story_star_nebula', 'assets/story/star_life/nebula.png');
+    this.load.image('story_star_protostar', 'assets/story/star_life/protostar.png');
+    this.load.image('story_star_star', 'assets/story/star_life/star.png');
+    this.load.image('story_star_red_giant', 'assets/story/star_life/red_giant.png');
+    this.load.image('story_star_supernova', 'assets/story/star_life/supernova.png');
+
+    // 水循环
+    this.load.image('story_water_ocean', 'assets/story/water_cycle/ocean.png');
+    this.load.image('story_water_evaporate', 'assets/story/water_cycle/evaporate.png');
+    this.load.image('story_water_cloud', 'assets/story/water_cycle/cloud.png');
+    this.load.image('story_water_rain', 'assets/story/water_cycle/rain.png');
+    this.load.image('story_water_river', 'assets/story/water_cycle/river.png');
   }
 
   create(): void {
