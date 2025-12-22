@@ -34,7 +34,12 @@
       "Bash(git commit:*)",
       "Bash(npx cap init \"Wonder Room\" \"com.wonderroom.app\" --web-dir dist)",
       "Bash(npm uninstall @capacitor/core @capacitor/cli @capacitor/android)",
-      "Bash(npx cap add android)"
+      "Bash(npx cap add android)",
+      "WebFetch(domain:www.gameart2d.com)",
+      "WebFetch(domain:openclipart.org)",
+      "WebFetch(domain:craftpix.net)",
+      "WebFetch(domain:game-icons.net)"
     ]
-  }
+  },
+  "outputStyle": "default"
 }

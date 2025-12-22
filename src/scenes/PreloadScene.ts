@@ -59,6 +59,67 @@ export class PreloadScene extends Phaser.Scene {
     this.load.image('arrow_left', 'assets/ui/arrow_basic_w.png');
     this.load.image('arrow_right', 'assets/ui/arrow_basic_e.png');
     this.load.image('checkmark', 'assets/ui/icon_checkmark.png');
+
+    // ===== 故事卡片图片资源 =====
+    // 蝴蝶变态
+    this.load.image('story_butterfly_caterpillar', 'assets/story/butterfly/caterpillar.png');
+    this.load.image('story_butterfly_cocoon', 'assets/story/butterfly/cocoon.png');
+    this.load.image('story_butterfly_butterfly', 'assets/story/butterfly/butterfly.png');
+
+    // 小鸡孵化
+    this.load.image('story_chicken_egg', 'assets/story/chicken/egg.png');
+    this.load.image('story_chicken_chick', 'assets/story/chicken/chick.png');
+    this.load.image('story_chicken_chicken', 'assets/story/chicken/chicken.png');
+
+    // 青蛙生长
+    this.load.image('story_frog_tadpole_egg', 'assets/story/frog/tadpole_egg.png');
+    this.load.image('story_frog_tadpole', 'assets/story/frog/tadpole.png');
+    this.load.image('story_frog_frog', 'assets/story/frog/frog.png');
+
+    // 飞蛾变态
+    this.load.image('story_caterpillar_egg', 'assets/story/caterpillar_full/egg.png');
+    this.load.image('story_caterpillar_tiny', 'assets/story/caterpillar_full/tiny_cat.png');
+    this.load.image('story_caterpillar_big', 'assets/story/caterpillar_full/big_cat.png');
+    this.load.image('story_caterpillar_pupa', 'assets/story/caterpillar_full/pupa.png');
+    this.load.image('story_caterpillar_moth', 'assets/story/caterpillar_full/moth.png');
+
+    // 蛋糕制作
+    this.load.image('story_cake_ingredients', 'assets/story/cake/ingredients.png');
+    this.load.image('story_cake_baking', 'assets/story/cake/baking.png');
+    this.load.image('story_cake_cake', 'assets/story/cake/cake.png');
+
+    // 面包制作
+    this.load.image('story_bread_wheat', 'assets/story/bread/wheat.png');
+    this.load.image('story_bread_flour', 'assets/story/bread/flour.png');
+    this.load.image('story_bread_dough', 'assets/story/bread/dough.png');
+    this.load.image('story_bread_bread', 'assets/story/bread/bread.png');
+
+    // 冰淇淋制作
+    this.load.image('story_icecream_milk', 'assets/story/ice_cream/milk.png');
+    this.load.image('story_icecream_mixing', 'assets/story/ice_cream/mixing.png');
+    this.load.image('story_icecream_freezing', 'assets/story/ice_cream/freezing.png');
+    this.load.image('story_icecream_cone', 'assets/story/ice_cream/cone.png');
+    this.load.image('story_icecream_sundae', 'assets/story/ice_cream/sundae.png');
+
+    // 苹果生长
+    this.load.image('story_apple_blossom', 'assets/story/apple/blossom.png');
+    this.load.image('story_apple_small', 'assets/story/apple/small_apple.png');
+    this.load.image('story_apple_green', 'assets/story/apple/green_apple.png');
+    this.load.image('story_apple_red', 'assets/story/apple/red_apple.png');
+
+    // 四季变换
+    this.load.image('story_seasons_spring', 'assets/story/seasons/spring.png');
+    this.load.image('story_seasons_summer', 'assets/story/seasons/summer.png');
+    this.load.image('story_seasons_autumn', 'assets/story/seasons/autumn.png');
+    this.load.image('story_seasons_winter', 'assets/story/seasons/winter.png');
+    this.load.image('story_seasons_spring2', 'assets/story/seasons/spring2.png');
+
+    // 火箭发射
+    this.load.image('story_rocket_blueprint', 'assets/story/rocket/blueprint.png');
+    this.load.image('story_rocket_building', 'assets/story/rocket/building.png');
+    this.load.image('story_rocket_launch', 'assets/story/rocket/launch.png');
+    this.load.image('story_rocket_space', 'assets/story/rocket/space.png');
+    this.load.image('story_rocket_planet', 'assets/story/rocket/planet.png');
   }
 
   create(): void {

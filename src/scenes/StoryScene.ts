@@ -155,6 +155,73 @@ const STORY_THEMES: StoryTheme[] = [
   }
 ];
 
+// 故事图片资源配置 - 定义哪些步骤使用图片渲染
+const STORY_IMAGES: Record<string, Record<string, string>> = {
+  // ===== 优先级1: 生物变态 =====
+  butterfly: {
+    caterpillar: 'story_butterfly_caterpillar',
+    cocoon: 'story_butterfly_cocoon',
+    butterfly: 'story_butterfly_butterfly'
+  },
+  chicken: {
+    egg: 'story_chicken_egg',
+    chick: 'story_chicken_chick',
+    chicken: 'story_chicken_chicken'
+  },
+  frog: {
+    tadpole_egg: 'story_frog_tadpole_egg',
+    tadpole: 'story_frog_tadpole',
+    frog: 'story_frog_frog'
+  },
+  caterpillar_full: {
+    egg2: 'story_caterpillar_egg',
+    tiny_cat: 'story_caterpillar_tiny',
+    big_cat: 'story_caterpillar_big',
+    pupa: 'story_caterpillar_pupa',
+    moth: 'story_caterpillar_moth'
+  },
+  // ===== 优先级2: 食物制作 =====
+  cake: {
+    ingredients: 'story_cake_ingredients',
+    baking: 'story_cake_baking',
+    cake: 'story_cake_cake'
+  },
+  bread: {
+    wheat: 'story_bread_wheat',
+    flour: 'story_bread_flour',
+    dough: 'story_bread_dough',
+    bread: 'story_bread_bread'
+  },
+  ice_cream: {
+    milk: 'story_icecream_milk',
+    mixing: 'story_icecream_mixing',
+    freezing: 'story_icecream_freezing',
+    cone: 'story_icecream_cone',
+    sundae: 'story_icecream_sundae'
+  },
+  // ===== 优先级3-4: 其他 =====
+  apple: {
+    blossom: 'story_apple_blossom',
+    small_apple: 'story_apple_small',
+    green_apple: 'story_apple_green',
+    red_apple: 'story_apple_red'
+  },
+  seasons: {
+    spring: 'story_seasons_spring',
+    summer: 'story_seasons_summer',
+    autumn: 'story_seasons_autumn',
+    winter: 'story_seasons_winter',
+    spring2: 'story_seasons_spring2'
+  },
+  rocket: {
+    blueprint: 'story_rocket_blueprint',
+    building: 'story_rocket_building',
+    launch: 'story_rocket_launch',
+    space: 'story_rocket_space',
+    planet: 'story_rocket_planet'
+  }
+};
+
 /**
  * 小小导演游戏
  * 核心玩法：故事排序 + 状态机
@@ -483,7 +550,7 @@ export class StoryScene extends Phaser.Scene {
 
     // 卡片内容
     const content = this.add.graphics();
-    this.drawCardContent(content, type, color, cardWidth);
+    this.drawCardContent(content, type, color, cardWidth, container);
 
     // 中文标签背景
     const labelBg = this.add.graphics();
@@ -551,361 +618,1291 @@ export class StoryScene extends Phaser.Scene {
     return card;
   }
 
-  private drawCardContent(graphics: Phaser.GameObjects.Graphics, type: string, color: number, cardWidth: number): void {
+  private drawCardContent(graphics: Phaser.GameObjects.Graphics, type: string, color: number, cardWidth: number, container?: Phaser.GameObjects.Container): void {
     const scale = cardWidth / 160;
     const contentY = -15 * scale; // 向上偏移，为标签留空间
 
     // 绘制图案区域背景
-    graphics.fillStyle(color, 0.2);
-    graphics.fillRoundedRect(-cardWidth / 2 + 10, -cardWidth * 0.625 + 10, cardWidth - 20, cardWidth - 30, 10);
+    graphics.fillStyle(color, 0.15);
+    graphics.fillRoundedRect(-cardWidth / 2 + 10, -cardWidth * 0.625 + 10, cardWidth - 20, cardWidth - 30, 12);
 
+    // 检查是否有对应的图片资源
+    const themeName = this.currentTheme.name;
+    const imageKey = STORY_IMAGES[themeName]?.[type];
+
+    if (imageKey && this.textures.exists(imageKey) && container) {
+      // 使用图片渲染
+      const imageSize = (cardWidth - 40) * 0.85;
+      const image = this.add.image(0, contentY, imageKey);
+      image.setDisplaySize(imageSize, imageSize);
+      container.add(image);
+      return; // 使用图片后直接返回，不执行代码绘制
+    }
+
+    // 以下是代码绘制逻辑（当没有图片资源时使用）
     switch (type) {
       // ===== 花朵生长 =====
       case 'seed':
+        // 花盆
+        graphics.fillStyle(0xCD853F, 1);
+        graphics.fillRect(-30 * scale, 18 * scale + contentY, 60 * scale, 22 * scale);
+        graphics.fillStyle(0xA0522D, 1);
+        graphics.fillRect(-35 * scale, 14 * scale + contentY, 70 * scale, 8 * scale);
         // 土壤
-        graphics.fillStyle(0x8B4513, 0.6);
-        graphics.fillRect(-35 * scale, 15 * scale + contentY, 70 * scale, 25 * scale);
-        // 种子
+        graphics.fillStyle(0x5D4037, 1);
+        graphics.fillRect(-28 * scale, 18 * scale + contentY, 56 * scale, 10 * scale);
+        // 可爱的种子 - 带眼睛
         graphics.fillStyle(color, 1);
-        graphics.fillEllipse(0, contentY, 22 * scale, 30 * scale);
-        // 种子纹理
-        graphics.lineStyle(2, 0x5a3825, 0.5);
-        graphics.lineBetween(-5 * scale, -10 * scale + contentY, 5 * scale, 5 * scale + contentY);
+        graphics.fillEllipse(0, -5 * scale + contentY, 24 * scale, 32 * scale);
+        // 种子高光
+        graphics.fillStyle(0xFFFFFF, 0.3);
+        graphics.fillEllipse(-6 * scale, -12 * scale + contentY, 8 * scale, 10 * scale);
+        // 种子眼睛 - 闭眼睡觉
+        graphics.lineStyle(2 * scale, 0x5a3825, 1);
+        graphics.beginPath();
+        graphics.arc(-5 * scale, -5 * scale + contentY, 4 * scale, 0.2, Math.PI - 0.2);
+        graphics.strokePath();
+        graphics.beginPath();
+        graphics.arc(5 * scale, -5 * scale + contentY, 4 * scale, 0.2, Math.PI - 0.2);
+        graphics.strokePath();
+        // 腮红
+        graphics.fillStyle(0xFFB6C1, 0.5);
+        graphics.fillCircle(-10 * scale, 2 * scale + contentY, 5 * scale);
+        graphics.fillCircle(10 * scale, 2 * scale + contentY, 5 * scale);
         break;
 
       case 'sprout':
+        // 花盆
+        graphics.fillStyle(0xCD853F, 1);
+        graphics.fillRect(-30 * scale, 22 * scale + contentY, 60 * scale, 18 * scale);
+        graphics.fillStyle(0xA0522D, 1);
+        graphics.fillRect(-35 * scale, 18 * scale + contentY, 70 * scale, 8 * scale);
         // 土壤
-        graphics.fillStyle(0x8B4513, 0.6);
-        graphics.fillRect(-35 * scale, 20 * scale + contentY, 70 * scale, 20 * scale);
-        // 茎
-        graphics.fillStyle(0x228b22, 1);
-        graphics.fillRect(-3 * scale, -15 * scale + contentY, 6 * scale, 40 * scale);
-        // 叶子
+        graphics.fillStyle(0x5D4037, 1);
+        graphics.fillRect(-28 * scale, 22 * scale + contentY, 56 * scale, 8 * scale);
+        // 茎 - 弯曲的
+        graphics.fillStyle(0x4CAF50, 1);
+        graphics.fillRect(-2 * scale, -5 * scale + contentY, 4 * scale, 30 * scale);
+        // 可爱的嫩叶
         graphics.fillStyle(color, 1);
-        graphics.fillEllipse(-18 * scale, -10 * scale + contentY, 22 * scale, 12 * scale);
-        graphics.fillEllipse(18 * scale, -5 * scale + contentY, 22 * scale, 12 * scale);
+        graphics.fillEllipse(-15 * scale, -15 * scale + contentY, 20 * scale, 12 * scale);
+        graphics.fillEllipse(15 * scale, -10 * scale + contentY, 20 * scale, 12 * scale);
         // 叶脉
-        graphics.lineStyle(1, 0x1a6b1a, 0.5);
-        graphics.lineBetween(-25 * scale, -10 * scale + contentY, -10 * scale, -10 * scale + contentY);
-        graphics.lineBetween(10 * scale, -5 * scale + contentY, 25 * scale, -5 * scale + contentY);
+        graphics.lineStyle(1.5 * scale, 0x2E7D32, 0.6);
+        graphics.lineBetween(-22 * scale, -15 * scale + contentY, -8 * scale, -15 * scale + contentY);
+        graphics.lineBetween(8 * scale, -10 * scale + contentY, 22 * scale, -10 * scale + contentY);
+        // 叶子高光
+        graphics.fillStyle(0xFFFFFF, 0.25);
+        graphics.fillEllipse(-15 * scale, -18 * scale + contentY, 10 * scale, 5 * scale);
+        graphics.fillEllipse(15 * scale, -13 * scale + contentY, 10 * scale, 5 * scale);
+        // 嫩芽顶部的小叶
+        graphics.fillStyle(0x81C784, 1);
+        graphics.fillEllipse(0, -28 * scale + contentY, 8 * scale, 12 * scale);
         break;
 
       case 'flower':
+        // 花盆
+        graphics.fillStyle(0xCD853F, 1);
+        graphics.fillRect(-25 * scale, 28 * scale + contentY, 50 * scale, 15 * scale);
+        graphics.fillStyle(0xA0522D, 1);
+        graphics.fillRect(-30 * scale, 24 * scale + contentY, 60 * scale, 8 * scale);
         // 茎
-        graphics.fillStyle(0x228b22, 1);
-        graphics.fillRect(-3 * scale, 5 * scale + contentY, 6 * scale, 35 * scale);
+        graphics.fillStyle(0x4CAF50, 1);
+        graphics.fillRect(-3 * scale, 0 + contentY, 6 * scale, 28 * scale);
         // 叶子
-        graphics.fillEllipse(-15 * scale, 25 * scale + contentY, 18 * scale, 10 * scale);
-        graphics.fillEllipse(15 * scale, 20 * scale + contentY, 18 * scale, 10 * scale);
-        // 花瓣
+        graphics.fillStyle(0x66BB6A, 1);
+        graphics.fillEllipse(-18 * scale, 15 * scale + contentY, 20 * scale, 10 * scale);
+        graphics.fillEllipse(18 * scale, 10 * scale + contentY, 20 * scale, 10 * scale);
+        // 美丽的花瓣 - 双层
+        graphics.fillStyle(color, 0.7);
+        for (let i = 0; i < 6; i++) {
+          const angle = (i / 6) * Math.PI * 2 + Math.PI / 6;
+          const px = Math.cos(angle) * 26 * scale;
+          const py = Math.sin(angle) * 26 * scale - 18 * scale + contentY;
+          graphics.fillEllipse(px, py, 14 * scale, 10 * scale);
+        }
         graphics.fillStyle(color, 1);
         for (let i = 0; i < 6; i++) {
           const angle = (i / 6) * Math.PI * 2 - Math.PI / 2;
-          const px = Math.cos(angle) * 22 * scale;
-          const py = Math.sin(angle) * 22 * scale - 15 * scale + contentY;
-          graphics.fillEllipse(px, py, 16 * scale, 10 * scale);
+          const px = Math.cos(angle) * 20 * scale;
+          const py = Math.sin(angle) * 20 * scale - 18 * scale + contentY;
+          graphics.fillEllipse(px, py, 15 * scale, 11 * scale);
         }
-        // 花蕊
-        graphics.fillStyle(0xffd700, 1);
-        graphics.fillCircle(0, -15 * scale + contentY, 12 * scale);
-        graphics.fillStyle(0xffa500, 1);
-        graphics.fillCircle(0, -15 * scale + contentY, 6 * scale);
+        // 花蕊 - 多层
+        graphics.fillStyle(0xFFEB3B, 1);
+        graphics.fillCircle(0, -18 * scale + contentY, 14 * scale);
+        graphics.fillStyle(0xFFC107, 1);
+        graphics.fillCircle(0, -18 * scale + contentY, 10 * scale);
+        graphics.fillStyle(0xFF9800, 1);
+        graphics.fillCircle(0, -18 * scale + contentY, 5 * scale);
+        // 花蕊高光
+        graphics.fillStyle(0xFFFFFF, 0.4);
+        graphics.fillCircle(-4 * scale, -22 * scale + contentY, 4 * scale);
         break;
 
       // ===== 蝴蝶变态 =====
       case 'caterpillar':
-        // 树枝
-        graphics.fillStyle(0x8b4513, 1);
-        graphics.fillRect(-40 * scale, 20 * scale + contentY, 80 * scale, 8 * scale);
-        // 身体
+        // 树叶背景
+        graphics.fillStyle(0x81C784, 1);
+        graphics.fillEllipse(0, 15 * scale + contentY, 65 * scale, 35 * scale);
+        graphics.fillStyle(0x4CAF50, 1);
+        graphics.fillEllipse(0, 15 * scale + contentY, 55 * scale, 28 * scale);
+        // 叶脉
+        graphics.lineStyle(2 * scale, 0x2E7D32, 0.5);
+        graphics.lineBetween(-25 * scale, 15 * scale + contentY, 25 * scale, 15 * scale + contentY);
+        // 可爱的毛毛虫身体 - 圆滚滚的
         graphics.fillStyle(color, 1);
         for (let i = 0; i < 5; i++) {
-          const segY = contentY + 10 * scale;
-          graphics.fillCircle(-28 * scale + i * 14 * scale, segY, 10 * scale);
+          const segY = contentY + 5 * scale;
+          const segSize = i === 0 ? 12 * scale : 10 * scale;
+          graphics.fillCircle(-24 * scale + i * 12 * scale, segY, segSize);
         }
-        // 眼睛
+        // 身体花纹
+        graphics.fillStyle(0xFFEB3B, 0.5);
+        for (let i = 1; i < 5; i++) {
+          graphics.fillCircle(-24 * scale + i * 12 * scale, 3 * scale + contentY, 4 * scale);
+        }
+        // 可爱的大眼睛
+        graphics.fillStyle(0xFFFFFF, 1);
+        graphics.fillCircle(-26 * scale, 0 + contentY, 6 * scale);
+        graphics.fillCircle(-18 * scale, 0 + contentY, 6 * scale);
         graphics.fillStyle(0x000000, 1);
-        graphics.fillCircle(-28 * scale, 6 * scale + contentY, 3 * scale);
-        // 触角
-        graphics.lineStyle(2, 0x000000, 1);
-        graphics.lineBetween(-32 * scale, 2 * scale + contentY, -38 * scale, -8 * scale + contentY);
-        graphics.lineBetween(-24 * scale, 2 * scale + contentY, -18 * scale, -8 * scale + contentY);
+        graphics.fillCircle(-25 * scale, 1 * scale + contentY, 3 * scale);
+        graphics.fillCircle(-17 * scale, 1 * scale + contentY, 3 * scale);
+        // 眼睛高光
+        graphics.fillStyle(0xFFFFFF, 1);
+        graphics.fillCircle(-26 * scale, -1 * scale + contentY, 1.5 * scale);
+        graphics.fillCircle(-18 * scale, -1 * scale + contentY, 1.5 * scale);
+        // 可爱的触角
+        graphics.lineStyle(2 * scale, 0x5D4037, 1);
+        graphics.lineBetween(-28 * scale, -6 * scale + contentY, -32 * scale, -18 * scale + contentY);
+        graphics.lineBetween(-18 * scale, -6 * scale + contentY, -14 * scale, -18 * scale + contentY);
+        graphics.fillStyle(0xFF5722, 1);
+        graphics.fillCircle(-32 * scale, -18 * scale + contentY, 3 * scale);
+        graphics.fillCircle(-14 * scale, -18 * scale + contentY, 3 * scale);
+        // 微笑
+        graphics.lineStyle(1.5 * scale, 0x5D4037, 1);
+        graphics.beginPath();
+        graphics.arc(-22 * scale, 6 * scale + contentY, 4 * scale, 0.3, Math.PI - 0.3);
+        graphics.strokePath();
         break;
 
       case 'cocoon':
         // 树枝
-        graphics.fillStyle(0x8b4513, 1);
-        graphics.fillRect(-5 * scale, -35 * scale + contentY, 10 * scale, 15 * scale);
-        // 茧
+        graphics.fillStyle(0x795548, 1);
+        graphics.fillRoundedRect(-35 * scale, -35 * scale + contentY, 70 * scale, 10 * scale, 5);
+        graphics.fillStyle(0x5D4037, 1);
+        graphics.fillRect(-3 * scale, -35 * scale + contentY, 6 * scale, 18 * scale);
+        // 丝线
+        graphics.lineStyle(1.5 * scale, 0x9E9E9E, 0.6);
+        graphics.lineBetween(0, -18 * scale + contentY, 0, -10 * scale + contentY);
+        // 茧 - 更精致
         graphics.fillStyle(color, 1);
-        graphics.fillEllipse(0, 5 * scale + contentY, 25 * scale, 40 * scale);
-        // 纹理
-        graphics.lineStyle(2, 0x6b3d1a, 0.5);
-        graphics.lineBetween(-10 * scale, -10 * scale + contentY, 10 * scale, -10 * scale + contentY);
+        graphics.fillEllipse(0, 8 * scale + contentY, 28 * scale, 42 * scale);
+        // 茧的纹理
+        graphics.lineStyle(1.5 * scale, 0x8D6E63, 0.4);
+        for (let i = -15; i <= 15; i += 10) {
+          graphics.beginPath();
+          graphics.arc(0, 8 * scale + contentY, 12 * scale, Math.PI * 0.2, Math.PI * 0.8);
+          graphics.strokePath();
+        }
+        graphics.lineBetween(-10 * scale, -8 * scale + contentY, 10 * scale, -8 * scale + contentY);
         graphics.lineBetween(-12 * scale, 5 * scale + contentY, 12 * scale, 5 * scale + contentY);
-        graphics.lineBetween(-10 * scale, 20 * scale + contentY, 10 * scale, 20 * scale + contentY);
+        graphics.lineBetween(-11 * scale, 18 * scale + contentY, 11 * scale, 18 * scale + contentY);
+        // 茧的高光
+        graphics.fillStyle(0xFFFFFF, 0.2);
+        graphics.fillEllipse(-8 * scale, 0 + contentY, 8 * scale, 20 * scale);
         break;
 
       case 'butterfly':
-        // 上翅膀
+        // 上翅膀 - 更华丽
         graphics.fillStyle(color, 1);
-        graphics.fillEllipse(-22 * scale, -8 * scale + contentY, 28 * scale, 22 * scale);
-        graphics.fillEllipse(22 * scale, -8 * scale + contentY, 28 * scale, 22 * scale);
+        graphics.fillEllipse(-24 * scale, -6 * scale + contentY, 30 * scale, 24 * scale);
+        graphics.fillEllipse(24 * scale, -6 * scale + contentY, 30 * scale, 24 * scale);
         // 下翅膀
-        graphics.fillEllipse(-18 * scale, 15 * scale + contentY, 20 * scale, 16 * scale);
-        graphics.fillEllipse(18 * scale, 15 * scale + contentY, 20 * scale, 16 * scale);
-        // 翅膀花纹
-        graphics.fillStyle(0xffffff, 0.5);
-        graphics.fillCircle(-22 * scale, -8 * scale + contentY, 8 * scale);
-        graphics.fillCircle(22 * scale, -8 * scale + contentY, 8 * scale);
+        graphics.fillEllipse(-20 * scale, 18 * scale + contentY, 22 * scale, 18 * scale);
+        graphics.fillEllipse(20 * scale, 18 * scale + contentY, 22 * scale, 18 * scale);
+        // 翅膀渐变装饰
+        graphics.fillStyle(0xFFFFFF, 0.4);
+        graphics.fillEllipse(-24 * scale, -10 * scale + contentY, 18 * scale, 12 * scale);
+        graphics.fillEllipse(24 * scale, -10 * scale + contentY, 18 * scale, 12 * scale);
+        // 翅膀圆点花纹
+        graphics.fillStyle(0xFFEB3B, 0.8);
+        graphics.fillCircle(-26 * scale, -6 * scale + contentY, 6 * scale);
+        graphics.fillCircle(26 * scale, -6 * scale + contentY, 6 * scale);
+        graphics.fillStyle(0x2196F3, 0.8);
+        graphics.fillCircle(-18 * scale, 0 + contentY, 4 * scale);
+        graphics.fillCircle(18 * scale, 0 + contentY, 4 * scale);
+        graphics.fillCircle(-20 * scale, 18 * scale + contentY, 5 * scale);
+        graphics.fillCircle(20 * scale, 18 * scale + contentY, 5 * scale);
+        // 翅膀边缘
+        graphics.lineStyle(2 * scale, 0x000000, 0.3);
+        graphics.strokeEllipse(-24 * scale, -6 * scale + contentY, 30 * scale, 24 * scale);
+        graphics.strokeEllipse(24 * scale, -6 * scale + contentY, 30 * scale, 24 * scale);
         // 身体
+        graphics.fillStyle(0x5D4037, 1);
+        graphics.fillEllipse(0, 5 * scale + contentY, 7 * scale, 32 * scale);
+        // 头部
+        graphics.fillCircle(0, -15 * scale + contentY, 6 * scale);
+        // 眼睛
         graphics.fillStyle(0x000000, 1);
-        graphics.fillEllipse(0, 5 * scale + contentY, 6 * scale, 35 * scale);
-        // 触角
-        graphics.lineStyle(2, 0x000000, 1);
-        graphics.lineBetween(-5 * scale, -18 * scale + contentY, -12 * scale, -30 * scale + contentY);
-        graphics.lineBetween(5 * scale, -18 * scale + contentY, 12 * scale, -30 * scale + contentY);
+        graphics.fillCircle(-3 * scale, -16 * scale + contentY, 2 * scale);
+        graphics.fillCircle(3 * scale, -16 * scale + contentY, 2 * scale);
+        // 触角 - 卷曲的
+        graphics.lineStyle(2 * scale, 0x5D4037, 1);
+        graphics.beginPath();
+        graphics.moveTo(-4 * scale, -20 * scale + contentY);
+        graphics.lineTo(-8 * scale, -35 * scale + contentY);
+        graphics.strokePath();
+        graphics.beginPath();
+        graphics.moveTo(4 * scale, -20 * scale + contentY);
+        graphics.lineTo(8 * scale, -35 * scale + contentY);
+        graphics.strokePath();
+        // 触角球
+        graphics.fillStyle(0x5D4037, 1);
+        graphics.fillCircle(-8 * scale, -35 * scale + contentY, 3 * scale);
+        graphics.fillCircle(8 * scale, -35 * scale + contentY, 3 * scale);
         break;
 
       // ===== 小鸡孵化 =====
       case 'egg':
-        // 鸡窝
-        graphics.fillStyle(0xdeb887, 0.8);
-        graphics.fillEllipse(0, 25 * scale + contentY, 50 * scale, 20 * scale);
-        graphics.lineStyle(2, 0x8b4513, 0.5);
-        for (let i = 0; i < 5; i++) {
-          graphics.lineBetween(-25 * scale + i * 12 * scale, 18 * scale + contentY, -20 * scale + i * 12 * scale, 32 * scale + contentY);
+        // 精美的鸡窝
+        graphics.fillStyle(0xD2B48C, 1);
+        graphics.fillEllipse(0, 28 * scale + contentY, 55 * scale, 18 * scale);
+        graphics.fillStyle(0xDEB887, 1);
+        graphics.fillEllipse(0, 25 * scale + contentY, 50 * scale, 15 * scale);
+        // 稻草纹理
+        graphics.lineStyle(2 * scale, 0xBFA76F, 0.7);
+        for (let i = 0; i < 7; i++) {
+          const sx = -28 * scale + i * 9 * scale;
+          graphics.lineBetween(sx, 20 * scale + contentY, sx + 5 * scale, 35 * scale + contentY);
         }
-        // 蛋
+        // 可爱的蛋
         graphics.fillStyle(color, 1);
-        graphics.fillEllipse(0, contentY, 32 * scale, 42 * scale);
-        // 高光
-        graphics.fillStyle(0xffffff, 0.4);
-        graphics.fillEllipse(-8 * scale, -12 * scale + contentY, 8 * scale, 12 * scale);
+        graphics.fillEllipse(0, 0 + contentY, 35 * scale, 45 * scale);
+        // 蛋的高光
+        graphics.fillStyle(0xFFFFFF, 0.4);
+        graphics.fillEllipse(-10 * scale, -12 * scale + contentY, 10 * scale, 15 * scale);
+        // 蛋壳上的斑点装饰
+        graphics.fillStyle(0xF5DEB3, 0.5);
+        graphics.fillCircle(8 * scale, -5 * scale + contentY, 4 * scale);
+        graphics.fillCircle(12 * scale, 8 * scale + contentY, 3 * scale);
+        graphics.fillCircle(-5 * scale, 10 * scale + contentY, 3 * scale);
         break;
 
       case 'chick':
-        // 身体
+        // 蛋壳碎片
+        graphics.fillStyle(0xFFFACD, 0.8);
+        graphics.fillEllipse(-20 * scale, 28 * scale + contentY, 15 * scale, 12 * scale);
+        graphics.fillEllipse(20 * scale, 30 * scale + contentY, 12 * scale, 10 * scale);
+        // 可爱的小鸡身体
         graphics.fillStyle(color, 1);
-        graphics.fillCircle(0, 8 * scale + contentY, 25 * scale);
-        // 头
-        graphics.fillCircle(0, -18 * scale + contentY, 18 * scale);
+        graphics.fillCircle(0, 12 * scale + contentY, 28 * scale);
         // 翅膀
-        graphics.fillEllipse(-22 * scale, 8 * scale + contentY, 12 * scale, 18 * scale);
-        graphics.fillEllipse(22 * scale, 8 * scale + contentY, 12 * scale, 18 * scale);
-        // 眼睛
+        graphics.fillStyle(0xFFD54F, 1);
+        graphics.fillEllipse(-25 * scale, 10 * scale + contentY, 14 * scale, 20 * scale);
+        graphics.fillEllipse(25 * scale, 10 * scale + contentY, 14 * scale, 20 * scale);
+        // 头
+        graphics.fillStyle(color, 1);
+        graphics.fillCircle(0, -16 * scale + contentY, 22 * scale);
+        // 头顶的小毛
+        graphics.fillStyle(0xFFB300, 1);
+        graphics.fillEllipse(-3 * scale, -38 * scale + contentY, 4 * scale, 8 * scale);
+        graphics.fillEllipse(3 * scale, -36 * scale + contentY, 3 * scale, 6 * scale);
+        graphics.fillEllipse(0, -40 * scale + contentY, 3 * scale, 7 * scale);
+        // 可爱的大眼睛
+        graphics.fillStyle(0xFFFFFF, 1);
+        graphics.fillCircle(-8 * scale, -18 * scale + contentY, 7 * scale);
+        graphics.fillCircle(8 * scale, -18 * scale + contentY, 7 * scale);
         graphics.fillStyle(0x000000, 1);
-        graphics.fillCircle(-6 * scale, -20 * scale + contentY, 4 * scale);
-        graphics.fillCircle(6 * scale, -20 * scale + contentY, 4 * scale);
-        // 嘴巴
-        graphics.fillStyle(0xff6600, 1);
-        graphics.fillTriangle(-6 * scale, -12 * scale + contentY, 6 * scale, -12 * scale + contentY, 0, -5 * scale + contentY);
-        // 脚
-        graphics.fillStyle(0xff6600, 1);
-        graphics.fillRect(-12 * scale, 30 * scale + contentY, 4 * scale, 12 * scale);
-        graphics.fillRect(8 * scale, 30 * scale + contentY, 4 * scale, 12 * scale);
+        graphics.fillCircle(-7 * scale, -17 * scale + contentY, 4 * scale);
+        graphics.fillCircle(9 * scale, -17 * scale + contentY, 4 * scale);
+        // 眼睛高光
+        graphics.fillStyle(0xFFFFFF, 1);
+        graphics.fillCircle(-9 * scale, -19 * scale + contentY, 2 * scale);
+        graphics.fillCircle(7 * scale, -19 * scale + contentY, 2 * scale);
+        // 橙色小嘴
+        graphics.fillStyle(0xFF6D00, 1);
+        graphics.fillTriangle(-6 * scale, -8 * scale + contentY, 6 * scale, -8 * scale + contentY, 0, 2 * scale + contentY);
+        // 腮红
+        graphics.fillStyle(0xFFCDD2, 0.6);
+        graphics.fillCircle(-15 * scale, -10 * scale + contentY, 5 * scale);
+        graphics.fillCircle(15 * scale, -10 * scale + contentY, 5 * scale);
+        // 小脚
+        graphics.fillStyle(0xFF6D00, 1);
+        graphics.fillRect(-10 * scale, 35 * scale + contentY, 5 * scale, 10 * scale);
+        graphics.fillRect(5 * scale, 35 * scale + contentY, 5 * scale, 10 * scale);
         break;
 
       case 'chicken':
-        // 身体
+        // 母鸡身体
         graphics.fillStyle(color, 1);
-        graphics.fillEllipse(0, 12 * scale + contentY, 42 * scale, 32 * scale);
+        graphics.fillEllipse(5 * scale, 15 * scale + contentY, 45 * scale, 32 * scale);
+        // 尾巴羽毛
+        graphics.fillStyle(0xE53935, 0.9);
+        graphics.fillEllipse(-28 * scale, 5 * scale + contentY, 12 * scale, 25 * scale);
+        graphics.fillEllipse(-32 * scale, 0 + contentY, 10 * scale, 22 * scale);
+        graphics.fillStyle(0xEF5350, 0.8);
+        graphics.fillEllipse(-25 * scale, 10 * scale + contentY, 10 * scale, 20 * scale);
+        // 翅膀
+        graphics.fillStyle(0xFFAB91, 1);
+        graphics.fillEllipse(12 * scale, 15 * scale + contentY, 22 * scale, 18 * scale);
+        // 翅膀纹理
+        graphics.lineStyle(1.5 * scale, 0xFF7043, 0.4);
+        graphics.beginPath();
+        graphics.arc(12 * scale, 15 * scale + contentY, 12 * scale, -0.5, 0.8);
+        graphics.strokePath();
         // 头
-        graphics.fillCircle(0, -20 * scale + contentY, 20 * scale);
+        graphics.fillStyle(color, 1);
+        graphics.fillCircle(20 * scale, -12 * scale + contentY, 20 * scale);
         // 鸡冠
-        graphics.fillStyle(0xff0000, 1);
-        graphics.fillCircle(-5 * scale, -40 * scale + contentY, 6 * scale);
-        graphics.fillCircle(5 * scale, -38 * scale + contentY, 7 * scale);
-        graphics.fillCircle(0, -35 * scale + contentY, 5 * scale);
+        graphics.fillStyle(0xD32F2F, 1);
+        graphics.fillCircle(15 * scale, -32 * scale + contentY, 7 * scale);
+        graphics.fillCircle(22 * scale, -30 * scale + contentY, 8 * scale);
+        graphics.fillCircle(28 * scale, -28 * scale + contentY, 6 * scale);
         // 眼睛
+        graphics.fillStyle(0xFFFFFF, 1);
+        graphics.fillCircle(25 * scale, -14 * scale + contentY, 6 * scale);
         graphics.fillStyle(0x000000, 1);
-        graphics.fillCircle(-7 * scale, -22 * scale + contentY, 4 * scale);
-        graphics.fillCircle(7 * scale, -22 * scale + contentY, 4 * scale);
+        graphics.fillCircle(26 * scale, -13 * scale + contentY, 3 * scale);
+        graphics.fillStyle(0xFFFFFF, 1);
+        graphics.fillCircle(24 * scale, -15 * scale + contentY, 1.5 * scale);
         // 嘴巴
-        graphics.fillStyle(0xff6600, 1);
-        graphics.fillTriangle(-5 * scale, -15 * scale + contentY, 5 * scale, -15 * scale + contentY, 0, -8 * scale + contentY);
-        // 尾巴
-        graphics.fillStyle(0xff6347, 0.8);
-        graphics.fillEllipse(-30 * scale, 5 * scale + contentY, 15 * scale, 20 * scale);
+        graphics.fillStyle(0xFF6D00, 1);
+        graphics.fillTriangle(32 * scale, -10 * scale + contentY, 32 * scale, -4 * scale + contentY, 42 * scale, -7 * scale + contentY);
+        // 肉垂
+        graphics.fillStyle(0xEF5350, 1);
+        graphics.fillEllipse(30 * scale, 0 + contentY, 6 * scale, 10 * scale);
+        // 脚
+        graphics.fillStyle(0xFF6D00, 1);
+        graphics.fillRect(0 + contentY, 40 * scale + contentY, 5 * scale, 12 * scale);
+        graphics.fillRect(12 * scale, 40 * scale + contentY, 5 * scale, 12 * scale);
         break;
 
       // ===== 青蛙生长 =====
       case 'tadpole_egg':
-        // 水
-        graphics.fillStyle(0x87ceeb, 0.4);
-        graphics.fillRoundedRect(-35 * scale, -25 * scale + contentY, 70 * scale, 55 * scale, 10);
-        // 卵
-        graphics.fillStyle(color, 0.8);
-        graphics.fillCircle(-12 * scale, -8 * scale + contentY, 12 * scale);
-        graphics.fillCircle(12 * scale, -5 * scale + contentY, 11 * scale);
-        graphics.fillCircle(0, 12 * scale + contentY, 13 * scale);
-        // 卵核
-        graphics.fillStyle(0x000000, 0.5);
-        graphics.fillCircle(-12 * scale, -8 * scale + contentY, 5 * scale);
-        graphics.fillCircle(12 * scale, -5 * scale + contentY, 4 * scale);
+        // 池塘水
+        graphics.fillStyle(0x81D4FA, 1);
+        graphics.fillRoundedRect(-38 * scale, -28 * scale + contentY, 76 * scale, 60 * scale, 12);
+        // 水波纹
+        graphics.lineStyle(1.5 * scale, 0x4FC3F7, 0.4);
+        graphics.beginPath();
+        graphics.arc(0, -10 * scale + contentY, 30 * scale, 0, Math.PI * 0.4);
+        graphics.strokePath();
+        // 透明的卵块
+        graphics.fillStyle(0xE0F7FA, 0.8);
+        graphics.fillCircle(0, 5 * scale + contentY, 28 * scale);
+        // 可爱的青蛙卵
+        graphics.fillStyle(color, 0.9);
+        graphics.fillCircle(-10 * scale, -2 * scale + contentY, 10 * scale);
+        graphics.fillCircle(10 * scale, 0 + contentY, 9 * scale);
+        graphics.fillCircle(0, 12 * scale + contentY, 11 * scale);
+        graphics.fillCircle(-8 * scale, 10 * scale + contentY, 8 * scale);
+        graphics.fillCircle(12 * scale, 12 * scale + contentY, 7 * scale);
+        // 卵核 - 小眼睛样式
+        graphics.fillStyle(0x37474F, 1);
+        graphics.fillCircle(-10 * scale, -2 * scale + contentY, 5 * scale);
+        graphics.fillCircle(10 * scale, 0 + contentY, 4 * scale);
         graphics.fillCircle(0, 12 * scale + contentY, 5 * scale);
+        // 高光
+        graphics.fillStyle(0xFFFFFF, 0.5);
+        graphics.fillCircle(-13 * scale, -5 * scale + contentY, 3 * scale);
+        graphics.fillCircle(7 * scale, -3 * scale + contentY, 2 * scale);
         break;
 
       case 'tadpole':
-        // 水
-        graphics.fillStyle(0x87ceeb, 0.4);
-        graphics.fillRoundedRect(-35 * scale, -25 * scale + contentY, 70 * scale, 55 * scale, 10);
-        // 头
+        // 池塘水
+        graphics.fillStyle(0x81D4FA, 1);
+        graphics.fillRoundedRect(-38 * scale, -28 * scale + contentY, 76 * scale, 60 * scale, 12);
+        // 水草
+        graphics.fillStyle(0x66BB6A, 1);
+        graphics.fillRect(25 * scale, 0 + contentY, 4 * scale, 35 * scale);
+        graphics.fillEllipse(28 * scale, -8 * scale + contentY, 10 * scale, 18 * scale);
+        // 可爱的蝌蚪 - 大头
         graphics.fillStyle(color, 1);
-        graphics.fillCircle(-10 * scale, 5 * scale + contentY, 15 * scale);
-        // 尾巴
+        graphics.fillCircle(-8 * scale, 5 * scale + contentY, 18 * scale);
+        // 蝌蚪尾巴 - 波浪形
         graphics.lineStyle(8 * scale, color, 1);
         graphics.beginPath();
-        graphics.moveTo(5 * scale, 5 * scale + contentY);
-        graphics.lineTo(25 * scale, 0 + contentY);
-        graphics.lineTo(35 * scale, 10 * scale + contentY);
+        graphics.moveTo(8 * scale, 5 * scale + contentY);
+        graphics.lineTo(28 * scale, 5 * scale + contentY);
         graphics.strokePath();
-        // 眼睛
+        graphics.lineStyle(5 * scale, color, 1);
+        graphics.beginPath();
+        graphics.moveTo(28 * scale, 5 * scale + contentY);
+        graphics.lineTo(35 * scale, 5 * scale + contentY);
+        graphics.strokePath();
+        // 可爱的大眼睛
+        graphics.fillStyle(0xFFFFFF, 1);
+        graphics.fillCircle(-12 * scale, 0 + contentY, 7 * scale);
+        graphics.fillCircle(-2 * scale, 0 + contentY, 7 * scale);
         graphics.fillStyle(0x000000, 1);
-        graphics.fillCircle(-15 * scale, 2 * scale + contentY, 3 * scale);
+        graphics.fillCircle(-11 * scale, 1 * scale + contentY, 4 * scale);
+        graphics.fillCircle(-1 * scale, 1 * scale + contentY, 4 * scale);
+        // 眼睛高光
+        graphics.fillStyle(0xFFFFFF, 1);
+        graphics.fillCircle(-13 * scale, -1 * scale + contentY, 2 * scale);
+        graphics.fillCircle(-3 * scale, -1 * scale + contentY, 2 * scale);
+        // 微笑
+        graphics.lineStyle(1.5 * scale, 0x2E7D32, 1);
+        graphics.beginPath();
+        graphics.arc(-7 * scale, 8 * scale + contentY, 5 * scale, 0.3, Math.PI - 0.3);
+        graphics.strokePath();
         break;
 
       case 'frog':
-        // 身体
+        // 荷叶
+        graphics.fillStyle(0x4CAF50, 1);
+        graphics.fillCircle(0, 25 * scale + contentY, 35 * scale);
+        graphics.fillStyle(0x66BB6A, 1);
+        graphics.fillCircle(0, 25 * scale + contentY, 30 * scale);
+        // 荷叶缺口
+        graphics.fillStyle(0x81D4FA, 1);
+        graphics.fillTriangle(0, 25 * scale + contentY, 15 * scale, 45 * scale + contentY, -15 * scale, 45 * scale + contentY);
+        // 可爱的青蛙身体
         graphics.fillStyle(color, 1);
-        graphics.fillEllipse(0, 12 * scale + contentY, 45 * scale, 30 * scale);
+        graphics.fillEllipse(0, 10 * scale + contentY, 45 * scale, 32 * scale);
+        // 肚皮
+        graphics.fillStyle(0xC8E6C9, 1);
+        graphics.fillEllipse(0, 15 * scale + contentY, 30 * scale, 20 * scale);
         // 头
-        graphics.fillEllipse(0, -10 * scale + contentY, 35 * scale, 25 * scale);
-        // 眼睛凸起
-        graphics.fillCircle(-12 * scale, -25 * scale + contentY, 12 * scale);
-        graphics.fillCircle(12 * scale, -25 * scale + contentY, 12 * scale);
+        graphics.fillStyle(color, 1);
+        graphics.fillEllipse(0, -10 * scale + contentY, 40 * scale, 28 * scale);
+        // 大眼睛凸起
+        graphics.fillStyle(color, 1);
+        graphics.fillCircle(-14 * scale, -25 * scale + contentY, 14 * scale);
+        graphics.fillCircle(14 * scale, -25 * scale + contentY, 14 * scale);
         // 眼白
-        graphics.fillStyle(0xffffff, 1);
-        graphics.fillCircle(-12 * scale, -25 * scale + contentY, 8 * scale);
-        graphics.fillCircle(12 * scale, -25 * scale + contentY, 8 * scale);
+        graphics.fillStyle(0xFFFFFF, 1);
+        graphics.fillCircle(-14 * scale, -25 * scale + contentY, 10 * scale);
+        graphics.fillCircle(14 * scale, -25 * scale + contentY, 10 * scale);
         // 瞳孔
         graphics.fillStyle(0x000000, 1);
-        graphics.fillCircle(-12 * scale, -25 * scale + contentY, 4 * scale);
-        graphics.fillCircle(12 * scale, -25 * scale + contentY, 4 * scale);
-        // 嘴巴
-        graphics.lineStyle(2, 0x228b22, 1);
+        graphics.fillCircle(-14 * scale, -24 * scale + contentY, 5 * scale);
+        graphics.fillCircle(14 * scale, -24 * scale + contentY, 5 * scale);
+        // 眼睛高光
+        graphics.fillStyle(0xFFFFFF, 1);
+        graphics.fillCircle(-16 * scale, -27 * scale + contentY, 3 * scale);
+        graphics.fillCircle(12 * scale, -27 * scale + contentY, 3 * scale);
+        // 腮红
+        graphics.fillStyle(0xFFCDD2, 0.5);
+        graphics.fillCircle(-22 * scale, -8 * scale + contentY, 6 * scale);
+        graphics.fillCircle(22 * scale, -8 * scale + contentY, 6 * scale);
+        // 可爱的微笑
+        graphics.lineStyle(2 * scale, 0x2E7D32, 1);
         graphics.beginPath();
-        graphics.arc(0, -5 * scale + contentY, 12 * scale, 0.2, Math.PI - 0.2);
+        graphics.arc(0, -5 * scale + contentY, 15 * scale, 0.2, Math.PI - 0.2);
         graphics.strokePath();
+        // 前脚
+        graphics.fillStyle(color, 1);
+        graphics.fillEllipse(-28 * scale, 25 * scale + contentY, 12 * scale, 8 * scale);
+        graphics.fillEllipse(28 * scale, 25 * scale + contentY, 12 * scale, 8 * scale);
         break;
 
       // ===== 日出日落 =====
       case 'sunrise':
-        // 地平线
-        graphics.fillStyle(0x228b22, 0.8);
-        graphics.fillRect(-40 * scale, 15 * scale + contentY, 80 * scale, 25 * scale);
-        // 天空渐变
-        graphics.fillStyle(0xffb6c1, 0.5);
-        graphics.fillRect(-40 * scale, -25 * scale + contentY, 80 * scale, 40 * scale);
-        // 太阳
-        graphics.fillStyle(color, 1);
-        graphics.fillCircle(0, 15 * scale + contentY, 22 * scale);
+        // 地平线 - 草地
+        graphics.fillStyle(0x66BB6A, 1);
+        graphics.fillRect(-40 * scale, 18 * scale + contentY, 80 * scale, 25 * scale);
+        // 小花装饰
+        graphics.fillStyle(0xFFEB3B, 1);
+        graphics.fillCircle(-28 * scale, 22 * scale + contentY, 3 * scale);
+        graphics.fillCircle(-15 * scale, 25 * scale + contentY, 2 * scale);
+        graphics.fillCircle(20 * scale, 23 * scale + contentY, 3 * scale);
+        // 天空渐变 - 粉红晨曦
+        graphics.fillGradientStyle(0xFFE0B2, 0xFFE0B2, color, color, 1);
+        graphics.fillRect(-40 * scale, -28 * scale + contentY, 80 * scale, 46 * scale);
+        // 可爱的太阳 - 刚升起
+        graphics.fillStyle(0xFFEB3B, 1);
+        graphics.fillCircle(0, 18 * scale + contentY, 25 * scale);
+        // 太阳高光
+        graphics.fillStyle(0xFFF9C4, 0.6);
+        graphics.fillCircle(-8 * scale, 12 * scale + contentY, 10 * scale);
         // 光芒
-        graphics.fillStyle(0xffd700, 0.6);
-        for (let i = 0; i < 5; i++) {
-          const angle = (i / 5) * Math.PI - Math.PI;
+        graphics.fillStyle(0xFFD54F, 0.7);
+        for (let i = 0; i < 6; i++) {
+          const angle = (i / 6) * Math.PI - Math.PI;
           graphics.fillTriangle(
-            Math.cos(angle) * 25 * scale, 15 * scale + Math.sin(angle) * 25 * scale + contentY,
-            Math.cos(angle - 0.15) * 40 * scale, 15 * scale + Math.sin(angle - 0.15) * 40 * scale + contentY,
-            Math.cos(angle + 0.15) * 40 * scale, 15 * scale + Math.sin(angle + 0.15) * 40 * scale + contentY
+            Math.cos(angle) * 28 * scale, 18 * scale + Math.sin(angle) * 28 * scale + contentY,
+            Math.cos(angle - 0.12) * 42 * scale, 18 * scale + Math.sin(angle - 0.12) * 42 * scale + contentY,
+            Math.cos(angle + 0.12) * 42 * scale, 18 * scale + Math.sin(angle + 0.12) * 42 * scale + contentY
           );
         }
+        // 小云朵
+        graphics.fillStyle(0xFFFFFF, 0.8);
+        graphics.fillCircle(-25 * scale, -12 * scale + contentY, 8 * scale);
+        graphics.fillCircle(-18 * scale, -15 * scale + contentY, 6 * scale);
         break;
 
       case 'sun':
         // 天空
-        graphics.fillStyle(0x87ceeb, 0.5);
-        graphics.fillRect(-40 * scale, -25 * scale + contentY, 80 * scale, 65 * scale);
-        // 太阳
+        graphics.fillStyle(0x64B5F6, 1);
+        graphics.fillRect(-40 * scale, -28 * scale + contentY, 80 * scale, 70 * scale);
+        // 白云
+        graphics.fillStyle(0xFFFFFF, 0.9);
+        graphics.fillCircle(-25 * scale, 15 * scale + contentY, 10 * scale);
+        graphics.fillCircle(-15 * scale, 12 * scale + contentY, 12 * scale);
+        graphics.fillCircle(-5 * scale, 15 * scale + contentY, 8 * scale);
+        graphics.fillCircle(22 * scale, 20 * scale + contentY, 8 * scale);
+        graphics.fillCircle(30 * scale, 18 * scale + contentY, 10 * scale);
+        // 可爱的太阳
         graphics.fillStyle(color, 1);
-        graphics.fillCircle(0, contentY, 25 * scale);
-        // 光芒
-        graphics.fillStyle(0xffa500, 1);
-        for (let i = 0; i < 8; i++) {
-          const angle = (i / 8) * Math.PI * 2;
+        graphics.fillCircle(0, -5 * scale + contentY, 28 * scale);
+        // 光芒 - 更精致
+        graphics.fillStyle(0xFFB300, 1);
+        for (let i = 0; i < 10; i++) {
+          const angle = (i / 10) * Math.PI * 2;
+          const outerR = 42 * scale;
           graphics.fillTriangle(
-            0, contentY,
-            Math.cos(angle - 0.15) * 40 * scale, Math.sin(angle - 0.15) * 40 * scale + contentY,
-            Math.cos(angle + 0.15) * 40 * scale, Math.sin(angle + 0.15) * 40 * scale + contentY
+            0, -5 * scale + contentY,
+            Math.cos(angle - 0.15) * outerR, Math.sin(angle - 0.15) * outerR - 5 * scale + contentY,
+            Math.cos(angle + 0.15) * outerR, Math.sin(angle + 0.15) * outerR - 5 * scale + contentY
           );
         }
+        // 太阳高光
+        graphics.fillStyle(0xFFF9C4, 0.5);
+        graphics.fillCircle(-10 * scale, -12 * scale + contentY, 12 * scale);
         // 笑脸
-        graphics.fillStyle(0x000000, 1);
-        graphics.fillCircle(-8 * scale, -5 * scale + contentY, 3 * scale);
-        graphics.fillCircle(8 * scale, -5 * scale + contentY, 3 * scale);
-        graphics.lineStyle(2, 0x000000, 1);
+        graphics.fillStyle(0x5D4037, 1);
+        graphics.fillCircle(-10 * scale, -10 * scale + contentY, 4 * scale);
+        graphics.fillCircle(10 * scale, -10 * scale + contentY, 4 * scale);
+        // 腮红
+        graphics.fillStyle(0xFFCDD2, 0.6);
+        graphics.fillCircle(-18 * scale, 0 + contentY, 5 * scale);
+        graphics.fillCircle(18 * scale, 0 + contentY, 5 * scale);
+        // 微笑
+        graphics.lineStyle(2.5 * scale, 0x5D4037, 1);
         graphics.beginPath();
-        graphics.arc(0, 5 * scale + contentY, 8 * scale, 0.3, Math.PI - 0.3);
+        graphics.arc(0, 2 * scale + contentY, 10 * scale, 0.3, Math.PI - 0.3);
         graphics.strokePath();
         break;
 
       case 'sunset':
-        // 地平线
-        graphics.fillStyle(0x2f4f4f, 0.8);
-        graphics.fillRect(-40 * scale, 18 * scale + contentY, 80 * scale, 22 * scale);
+        // 地面剪影
+        graphics.fillStyle(0x37474F, 1);
+        graphics.fillRect(-40 * scale, 20 * scale + contentY, 80 * scale, 22 * scale);
+        // 小山剪影
+        graphics.fillTriangle(-20 * scale, 20 * scale + contentY, 0, 5 * scale + contentY, 20 * scale, 20 * scale + contentY);
+        // 天空 - 橙红渐变
+        graphics.fillGradientStyle(0xFFCC80, 0xFFCC80, color, color, 1);
+        graphics.fillRect(-40 * scale, -28 * scale + contentY, 80 * scale, 48 * scale);
+        // 落日
+        graphics.fillStyle(0xFFAB40, 1);
+        graphics.fillCircle(0, 20 * scale + contentY, 22 * scale);
+        graphics.fillStyle(color, 0.8);
+        graphics.fillCircle(0, 20 * scale + contentY, 18 * scale);
+        // 高光
+        graphics.fillStyle(0xFFE0B2, 0.5);
+        graphics.fillCircle(-6 * scale, 14 * scale + contentY, 8 * scale);
+        // 晚霞云彩
+        graphics.fillStyle(0xFF8A65, 0.7);
+        graphics.fillEllipse(-20 * scale, -10 * scale + contentY, 25 * scale, 8 * scale);
+        graphics.fillEllipse(18 * scale, -5 * scale + contentY, 20 * scale, 6 * scale);
+        // 树的剪影
+        graphics.fillStyle(0x263238, 1);
+        graphics.fillRect(28 * scale, 5 * scale + contentY, 4 * scale, 18 * scale);
+        graphics.fillTriangle(22 * scale, 8 * scale + contentY, 30 * scale, -10 * scale + contentY, 38 * scale, 8 * scale + contentY);
+        break;
+
+      // ===== 房子建造 =====
+      case 'foundation':
         // 天空
-        graphics.fillStyle(0xff6347, 0.6);
-        graphics.fillRect(-40 * scale, -25 * scale + contentY, 80 * scale, 43 * scale);
-        graphics.fillStyle(0xffa500, 0.4);
-        graphics.fillRect(-40 * scale, 5 * scale + contentY, 80 * scale, 13 * scale);
-        // 太阳
+        graphics.fillStyle(0x87CEEB, 1);
+        graphics.fillRect(-40 * scale, -30 * scale + contentY, 80 * scale, 55 * scale);
+        // 地面
+        graphics.fillStyle(0x90EE90, 1);
+        graphics.fillRect(-40 * scale, 20 * scale + contentY, 80 * scale, 25 * scale);
+        // 地基坑
+        graphics.fillStyle(0x654321, 1);
+        graphics.fillRect(-32 * scale, 15 * scale + contentY, 64 * scale, 15 * scale);
+        // 水泥地基
         graphics.fillStyle(color, 1);
-        graphics.fillCircle(0, 18 * scale + contentY, 20 * scale);
+        graphics.fillRect(-30 * scale, 10 * scale + contentY, 60 * scale, 12 * scale);
+        // 地基纹理
+        graphics.lineStyle(2 * scale, 0x606060, 0.5);
+        graphics.lineBetween(-30 * scale, 16 * scale + contentY, 30 * scale, 16 * scale + contentY);
+        // 砖块堆
+        graphics.fillStyle(0xCD853F, 1);
+        graphics.fillRect(-35 * scale, -5 * scale + contentY, 20 * scale, 15 * scale);
+        graphics.fillStyle(0xD2691E, 1);
+        graphics.fillRect(-33 * scale, -3 * scale + contentY, 8 * scale, 6 * scale);
+        graphics.fillRect(-23 * scale, -3 * scale + contentY, 8 * scale, 6 * scale);
+        graphics.fillRect(-28 * scale, 5 * scale + contentY, 8 * scale, 6 * scale);
+        // 铲子
+        graphics.fillStyle(0x8B4513, 1);
+        graphics.fillRect(25 * scale, -20 * scale + contentY, 4 * scale, 35 * scale);
+        graphics.fillStyle(0x696969, 1);
+        graphics.fillRoundedRect(20 * scale, 10 * scale + contentY, 14 * scale, 12 * scale, 3);
+        break;
+
+      case 'walls':
+        // 天空
+        graphics.fillStyle(0x87CEEB, 1);
+        graphics.fillRect(-40 * scale, -30 * scale + contentY, 80 * scale, 55 * scale);
+        // 地面
+        graphics.fillStyle(0x90EE90, 1);
+        graphics.fillRect(-40 * scale, 22 * scale + contentY, 80 * scale, 23 * scale);
+        // 地基
+        graphics.fillStyle(0x808080, 1);
+        graphics.fillRect(-32 * scale, 18 * scale + contentY, 64 * scale, 8 * scale);
+        // 砖墙
+        graphics.fillStyle(color, 1);
+        graphics.fillRect(-28 * scale, -15 * scale + contentY, 56 * scale, 35 * scale);
+        // 砖缝
+        graphics.lineStyle(1.5 * scale, 0x8B4513, 0.6);
+        for (let row = 0; row < 5; row++) {
+          const y = -12 + row * 7;
+          graphics.lineBetween(-28 * scale, y * scale + contentY, 28 * scale, y * scale + contentY);
+          for (let col = 0; col < 8; col++) {
+            const x = -28 + col * 7 + (row % 2) * 3.5;
+            graphics.lineBetween(x * scale, (y - 7) * scale + contentY, x * scale, y * scale + contentY);
+          }
+        }
+        // 窗户框
+        graphics.fillStyle(0x4169E1, 0.5);
+        graphics.fillRect(-18 * scale, -8 * scale + contentY, 16 * scale, 14 * scale);
+        graphics.fillRect(2 * scale, -8 * scale + contentY, 16 * scale, 14 * scale);
+        // 窗框
+        graphics.lineStyle(2 * scale, 0xFFFFFF, 1);
+        graphics.strokeRect(-18 * scale, -8 * scale + contentY, 16 * scale, 14 * scale);
+        graphics.strokeRect(2 * scale, -8 * scale + contentY, 16 * scale, 14 * scale);
+        break;
+
+      case 'roof':
+        // 天空
+        graphics.fillStyle(0x87CEEB, 1);
+        graphics.fillRect(-40 * scale, -35 * scale + contentY, 80 * scale, 55 * scale);
+        // 地面
+        graphics.fillStyle(0x90EE90, 1);
+        graphics.fillRect(-40 * scale, 18 * scale + contentY, 80 * scale, 27 * scale);
+        // 墙壁（简化）
+        graphics.fillStyle(0xCD853F, 1);
+        graphics.fillRect(-28 * scale, -5 * scale + contentY, 56 * scale, 25 * scale);
+        // 红瓦屋顶
+        graphics.fillStyle(color, 1);
+        graphics.fillTriangle(-35 * scale, -5 * scale + contentY, 0, -35 * scale + contentY, 35 * scale, -5 * scale + contentY);
+        // 屋顶瓦片纹理
+        graphics.lineStyle(2 * scale, 0x8B0000, 0.5);
+        for (let i = 0; i < 4; i++) {
+          const y = -30 + i * 7;
+          graphics.beginPath();
+          graphics.moveTo((-25 + i * 8) * scale, y * scale + contentY);
+          graphics.lineTo((25 - i * 8) * scale, y * scale + contentY);
+          graphics.strokePath();
+        }
+        // 窗户
+        graphics.fillStyle(0x87CEEB, 1);
+        graphics.fillRect(-12 * scale, 0 + contentY, 10 * scale, 12 * scale);
+        graphics.fillRect(2 * scale, 0 + contentY, 10 * scale, 12 * scale);
+        // 起重机
+        graphics.fillStyle(0xFFD700, 1);
+        graphics.fillRect(30 * scale, -30 * scale + contentY, 4 * scale, 50 * scale);
+        graphics.fillRect(20 * scale, -30 * scale + contentY, 20 * scale, 4 * scale);
+        break;
+
+      case 'house':
+        // 蓝天白云
+        graphics.fillStyle(0x87CEEB, 1);
+        graphics.fillRect(-40 * scale, -35 * scale + contentY, 80 * scale, 55 * scale);
+        // 云朵
+        graphics.fillStyle(0xFFFFFF, 0.9);
+        graphics.fillCircle(-28 * scale, -28 * scale + contentY, 8 * scale);
+        graphics.fillCircle(-20 * scale, -30 * scale + contentY, 10 * scale);
+        graphics.fillCircle(-12 * scale, -28 * scale + contentY, 7 * scale);
+        // 草地
+        graphics.fillStyle(0x90EE90, 1);
+        graphics.fillRect(-40 * scale, 18 * scale + contentY, 80 * scale, 27 * scale);
+        // 房子主体
+        graphics.fillStyle(0xFFE4B5, 1);
+        graphics.fillRect(-25 * scale, -5 * scale + contentY, 50 * scale, 25 * scale);
+        // 红瓦屋顶
+        graphics.fillStyle(color, 1);
+        graphics.fillTriangle(-32 * scale, -5 * scale + contentY, 0, -32 * scale + contentY, 32 * scale, -5 * scale + contentY);
+        // 烟囱
+        graphics.fillStyle(0xCD853F, 1);
+        graphics.fillRect(15 * scale, -28 * scale + contentY, 10 * scale, 15 * scale);
+        // 烟
+        graphics.fillStyle(0xE0E0E0, 0.7);
+        graphics.fillCircle(20 * scale, -32 * scale + contentY, 5 * scale);
+        graphics.fillCircle(22 * scale, -38 * scale + contentY, 4 * scale);
+        graphics.fillCircle(20 * scale, -43 * scale + contentY, 3 * scale);
+        // 门
+        graphics.fillStyle(0x8B4513, 1);
+        graphics.fillRoundedRect(-8 * scale, 2 * scale + contentY, 16 * scale, 20 * scale, 3);
+        // 门把手
+        graphics.fillStyle(0xFFD700, 1);
+        graphics.fillCircle(5 * scale, 12 * scale + contentY, 2 * scale);
+        // 窗户
+        graphics.fillStyle(0x87CEEB, 1);
+        graphics.fillRect(-22 * scale, 0 + contentY, 10 * scale, 10 * scale);
+        graphics.fillRect(12 * scale, 0 + contentY, 10 * scale, 10 * scale);
+        // 窗框
+        graphics.lineStyle(2 * scale, 0xFFFFFF, 1);
+        graphics.strokeRect(-22 * scale, 0 + contentY, 10 * scale, 10 * scale);
+        graphics.strokeRect(12 * scale, 0 + contentY, 10 * scale, 10 * scale);
+        graphics.lineBetween(-17 * scale, 0 + contentY, -17 * scale, 10 * scale + contentY);
+        graphics.lineBetween(17 * scale, 0 + contentY, 17 * scale, 10 * scale + contentY);
+        // 小花
+        graphics.fillStyle(0xFF69B4, 1);
+        graphics.fillCircle(-30 * scale, 22 * scale + contentY, 4 * scale);
+        graphics.fillCircle(30 * scale, 24 * scale + contentY, 3 * scale);
+        break;
+
+      // ===== 月相变化 =====
+      case 'new_moon':
+        // 深蓝夜空
+        graphics.fillStyle(0x0a1628, 1);
+        graphics.fillRect(-40 * scale, -35 * scale + contentY, 80 * scale, 80 * scale);
+        // 星星
+        graphics.fillStyle(0xFFFFFF, 1);
+        const starPos1 = [[-30, -25], [-20, -10], [-10, -28], [5, -20], [15, -30], [25, -15], [30, -25], [-25, 5], [20, 10]];
+        for (const [sx, sy] of starPos1) {
+          graphics.fillCircle(sx * scale, sy * scale + contentY, 2 * scale);
+        }
+        // 新月 - 几乎看不见
+        graphics.fillStyle(0x1a2638, 1);
+        graphics.fillCircle(0, 0 + contentY, 28 * scale);
+        // 月亮轮廓微光
+        graphics.lineStyle(2 * scale, 0x333344, 0.5);
+        graphics.strokeCircle(0, 0 + contentY, 28 * scale);
+        break;
+
+      case 'crescent':
+        // 深蓝夜空
+        graphics.fillStyle(0x0a1628, 1);
+        graphics.fillRect(-40 * scale, -35 * scale + contentY, 80 * scale, 80 * scale);
+        // 星星
+        graphics.fillStyle(0xFFFFFF, 1);
+        const starPos2 = [[-30, -25], [-20, 15], [-15, -15], [25, -28], [30, 5], [35, -15]];
+        for (const [sx, sy] of starPos2) {
+          graphics.fillCircle(sx * scale, sy * scale + contentY, 2 * scale);
+        }
+        // 月牙
+        graphics.fillStyle(color, 1);
+        graphics.fillCircle(0, 0 + contentY, 26 * scale);
+        // 用深色圆遮盖形成月牙
+        graphics.fillStyle(0x0a1628, 1);
+        graphics.fillCircle(12 * scale, 0 + contentY, 24 * scale);
+        // 月亮高光
+        graphics.fillStyle(0xFFFFFF, 0.2);
+        graphics.fillCircle(-15 * scale, -8 * scale + contentY, 8 * scale);
+        // 可爱的睡眼
+        graphics.fillStyle(0x555555, 0.7);
+        graphics.lineStyle(2 * scale, 0x444444, 1);
+        graphics.beginPath();
+        graphics.arc(-8 * scale, -5 * scale + contentY, 4 * scale, 0.2, Math.PI - 0.2);
+        graphics.strokePath();
+        break;
+
+      case 'half':
+        // 深蓝夜空
+        graphics.fillStyle(0x0a1628, 1);
+        graphics.fillRect(-40 * scale, -35 * scale + contentY, 80 * scale, 80 * scale);
+        // 星星
+        graphics.fillStyle(0xFFFFFF, 1);
+        const starPos3 = [[-35, -20], [-28, 10], [30, -25], [35, 5], [25, 20]];
+        for (const [sx, sy] of starPos3) {
+          graphics.fillCircle(sx * scale, sy * scale + contentY, 2 * scale);
+        }
+        // 半月
+        graphics.fillStyle(color, 1);
+        graphics.fillCircle(0, 0 + contentY, 26 * scale);
+        // 用深色遮盖右半边
+        graphics.fillStyle(0x0a1628, 1);
+        graphics.fillRect(0, -28 * scale + contentY, 30 * scale, 56 * scale);
+        // 月亮高光
+        graphics.fillStyle(0xFFFFFF, 0.2);
+        graphics.fillCircle(-12 * scale, -10 * scale + contentY, 10 * scale);
+        // 月球环形山
+        graphics.fillStyle(0x999999, 0.3);
+        graphics.fillCircle(-8 * scale, 8 * scale + contentY, 5 * scale);
+        graphics.fillCircle(-18 * scale, -2 * scale + contentY, 4 * scale);
+        break;
+
+      case 'full_moon':
+        // 深蓝夜空
+        graphics.fillStyle(0x0a1628, 1);
+        graphics.fillRect(-40 * scale, -35 * scale + contentY, 80 * scale, 80 * scale);
+        // 星星
+        graphics.fillStyle(0xFFFFFF, 1);
+        const starPos4 = [[-35, -28], [-30, 15], [-20, -20], [28, -25], [35, 10], [30, 25], [-35, 25]];
+        for (const [sx, sy] of starPos4) {
+          graphics.fillCircle(sx * scale, sy * scale + contentY, 2 * scale);
+        }
+        // 满月
+        graphics.fillStyle(color, 1);
+        graphics.fillCircle(0, 0 + contentY, 30 * scale);
+        // 月亮高光
+        graphics.fillStyle(0xFFFFFF, 0.3);
+        graphics.fillCircle(-10 * scale, -10 * scale + contentY, 12 * scale);
+        // 月球环形山
+        graphics.fillStyle(0xC0C0C0, 0.4);
+        graphics.fillCircle(-5 * scale, 10 * scale + contentY, 6 * scale);
+        graphics.fillCircle(12 * scale, -5 * scale + contentY, 5 * scale);
+        graphics.fillCircle(-15 * scale, 0 + contentY, 4 * scale);
+        graphics.fillCircle(5 * scale, -12 * scale + contentY, 3 * scale);
+        // 兔子剪影
+        graphics.fillStyle(0xAAAAAA, 0.3);
+        graphics.fillEllipse(5 * scale, 5 * scale + contentY, 12 * scale, 10 * scale);
+        graphics.fillCircle(0, -2 * scale + contentY, 6 * scale);
+        graphics.fillEllipse(-2 * scale, -12 * scale + contentY, 3 * scale, 8 * scale);
+        graphics.fillEllipse(4 * scale, -10 * scale + contentY, 3 * scale, 7 * scale);
+        break;
+
+      // ===== 蛋糕制作 =====
+      case 'ingredients':
+        // 桌面背景
+        graphics.fillStyle(0xDEB887, 1);
+        graphics.fillRect(-40 * scale, 20 * scale + contentY, 80 * scale, 25 * scale);
+        // 可爱的碗
+        graphics.fillStyle(0x87CEEB, 1);
+        graphics.fillEllipse(0, 15 * scale + contentY, 50 * scale, 25 * scale);
+        graphics.fillStyle(0xADD8E6, 1);
+        graphics.fillEllipse(0, 10 * scale + contentY, 42 * scale, 18 * scale);
+        // 碗里的面粉
+        graphics.fillStyle(0xFFFAF0, 1);
+        graphics.fillEllipse(0, 8 * scale + contentY, 36 * scale, 12 * scale);
+        // 鸡蛋
+        graphics.fillStyle(0xFFFACD, 1);
+        graphics.fillEllipse(-25 * scale, -15 * scale + contentY, 18 * scale, 22 * scale);
+        graphics.fillStyle(0xFFFFFF, 0.4);
+        graphics.fillEllipse(-28 * scale, -20 * scale + contentY, 6 * scale, 8 * scale);
+        // 黄油块
+        graphics.fillStyle(0xFFD700, 1);
+        graphics.fillRoundedRect(15 * scale, -25 * scale + contentY, 22 * scale, 18 * scale, 4);
+        graphics.fillStyle(0xFFF8DC, 1);
+        graphics.fillRoundedRect(17 * scale, -23 * scale + contentY, 18 * scale, 6 * scale, 2);
+        // 牛奶瓶
+        graphics.fillStyle(0xFFFFFF, 1);
+        graphics.fillRoundedRect(-8 * scale, -35 * scale + contentY, 16 * scale, 25 * scale, 4);
+        graphics.fillStyle(0x87CEEB, 1);
+        graphics.fillRoundedRect(-6 * scale, -38 * scale + contentY, 12 * scale, 6 * scale, 3);
+        break;
+
+      case 'baking':
+        // 烤箱外框
+        graphics.fillStyle(0x696969, 1);
+        graphics.fillRoundedRect(-38 * scale, -30 * scale + contentY, 76 * scale, 65 * scale, 8);
+        // 烤箱玻璃门
+        graphics.fillStyle(0x4A4A4A, 1);
+        graphics.fillRoundedRect(-32 * scale, -24 * scale + contentY, 64 * scale, 45 * scale, 5);
+        // 烤箱内部 - 橙红色发光
+        graphics.fillStyle(0xFF6B35, 0.8);
+        graphics.fillRoundedRect(-28 * scale, -20 * scale + contentY, 56 * scale, 37 * scale, 4);
+        // 烤箱里的蛋糕模具
+        graphics.fillStyle(0xCD853F, 1);
+        graphics.fillEllipse(0, 5 * scale + contentY, 35 * scale, 15 * scale);
+        // 膨胀的蛋糕
+        graphics.fillStyle(color, 1);
+        graphics.fillEllipse(0, -5 * scale + contentY, 30 * scale, 18 * scale);
+        // 蛋糕高光
+        graphics.fillStyle(0xFFFFFF, 0.3);
+        graphics.fillEllipse(-8 * scale, -10 * scale + contentY, 12 * scale, 8 * scale);
+        // 温度指示灯
+        graphics.fillStyle(0xFF0000, 1);
+        graphics.fillCircle(28 * scale, -28 * scale + contentY, 5 * scale);
+        // 热气
+        graphics.lineStyle(2 * scale, 0xFFFFFF, 0.5);
+        for (let i = 0; i < 3; i++) {
+          graphics.beginPath();
+          graphics.moveTo((-15 + i * 15) * scale, -35 * scale + contentY);
+          graphics.lineTo((-15 + i * 15) * scale, -48 * scale + contentY);
+          graphics.strokePath();
+        }
+        break;
+
+      case 'cake':
+        // 蛋糕盘子
+        graphics.fillStyle(0xFFFFFF, 1);
+        graphics.fillEllipse(0, 32 * scale + contentY, 55 * scale, 12 * scale);
+        // 第一层蛋糕
+        graphics.fillStyle(0xFFB6C1, 1);
+        graphics.fillRoundedRect(-30 * scale, 10 * scale + contentY, 60 * scale, 25 * scale, 5);
+        // 第二层蛋糕
+        graphics.fillStyle(color, 1);
+        graphics.fillRoundedRect(-22 * scale, -12 * scale + contentY, 44 * scale, 25 * scale, 5);
+        // 奶油装饰 - 波浪边
+        graphics.fillStyle(0xFFFFFF, 1);
+        for (let i = 0; i < 7; i++) {
+          graphics.fillCircle((-28 + i * 10) * scale, 10 * scale + contentY, 6 * scale);
+        }
+        for (let i = 0; i < 5; i++) {
+          graphics.fillCircle((-20 + i * 10) * scale, -12 * scale + contentY, 5 * scale);
+        }
+        // 蜡烛
+        graphics.fillStyle(0xFF69B4, 1);
+        graphics.fillRect(-3 * scale, -35 * scale + contentY, 6 * scale, 25 * scale);
+        // 火焰
+        graphics.fillStyle(0xFFD700, 1);
+        graphics.fillEllipse(0, -42 * scale + contentY, 8 * scale, 12 * scale);
+        graphics.fillStyle(0xFF4500, 1);
+        graphics.fillEllipse(0, -40 * scale + contentY, 4 * scale, 8 * scale);
+        // 樱桃装饰
+        graphics.fillStyle(0xFF0000, 1);
+        graphics.fillCircle(-15 * scale, -5 * scale + contentY, 6 * scale);
+        graphics.fillCircle(15 * scale, -5 * scale + contentY, 6 * scale);
+        graphics.fillCircle(0, 15 * scale + contentY, 6 * scale);
+        // 樱桃高光
+        graphics.fillStyle(0xFFFFFF, 0.5);
+        graphics.fillCircle(-17 * scale, -7 * scale + contentY, 2 * scale);
+        graphics.fillCircle(13 * scale, -7 * scale + contentY, 2 * scale);
+        break;
+
+      // ===== 树木生长 =====
+      case 'seed2':
+        // 地面/土壤
+        graphics.fillStyle(0x8B4513, 1);
+        graphics.fillRect(-40 * scale, 15 * scale + contentY, 80 * scale, 30 * scale);
+        graphics.fillStyle(0x654321, 1);
+        graphics.fillRect(-40 * scale, 15 * scale + contentY, 80 * scale, 8 * scale);
+        // 土壤纹理
+        graphics.fillStyle(0x5D3A1A, 0.5);
+        for (let i = 0; i < 6; i++) {
+          graphics.fillCircle((-30 + i * 12) * scale, 28 * scale + contentY, 4 * scale);
+        }
+        // 可爱的种子 - 在土里
+        graphics.fillStyle(color, 1);
+        graphics.fillEllipse(0, 5 * scale + contentY, 20 * scale, 28 * scale);
+        // 种子高光
+        graphics.fillStyle(0xFFFFFF, 0.3);
+        graphics.fillEllipse(-5 * scale, -2 * scale + contentY, 6 * scale, 10 * scale);
+        // 种子闭眼
+        graphics.lineStyle(2 * scale, 0x5a3825, 1);
+        graphics.beginPath();
+        graphics.arc(-4 * scale, 2 * scale + contentY, 3 * scale, 0.2, Math.PI - 0.2);
+        graphics.strokePath();
+        graphics.beginPath();
+        graphics.arc(4 * scale, 2 * scale + contentY, 3 * scale, 0.2, Math.PI - 0.2);
+        graphics.strokePath();
+        // 太阳
+        graphics.fillStyle(0xFFD700, 1);
+        graphics.fillCircle(28 * scale, -28 * scale + contentY, 15 * scale);
+        // 水滴
+        graphics.fillStyle(0x4FC3F7, 1);
+        graphics.fillCircle(-25 * scale, -20 * scale + contentY, 6 * scale);
+        graphics.fillTriangle(-31 * scale, -20 * scale + contentY, -19 * scale, -20 * scale + contentY, -25 * scale, -30 * scale + contentY);
+        break;
+
+      case 'sapling':
+        // 地面
+        graphics.fillStyle(0x8B4513, 1);
+        graphics.fillRect(-40 * scale, 22 * scale + contentY, 80 * scale, 25 * scale);
+        // 土堆
+        graphics.fillStyle(0x654321, 1);
+        graphics.fillEllipse(0, 25 * scale + contentY, 40 * scale, 15 * scale);
+        // 茎
+        graphics.fillStyle(0x7CB342, 1);
+        graphics.fillRect(-3 * scale, -5 * scale + contentY, 6 * scale, 35 * scale);
+        // 两片嫩叶
+        graphics.fillStyle(color, 1);
+        graphics.fillEllipse(-18 * scale, -15 * scale + contentY, 22 * scale, 14 * scale);
+        graphics.fillEllipse(18 * scale, -10 * scale + contentY, 22 * scale, 14 * scale);
+        // 叶脉
+        graphics.lineStyle(1.5 * scale, 0x558B2F, 0.6);
+        graphics.lineBetween(-26 * scale, -15 * scale + contentY, -10 * scale, -15 * scale + contentY);
+        graphics.lineBetween(10 * scale, -10 * scale + contentY, 26 * scale, -10 * scale + contentY);
+        // 顶芽
+        graphics.fillStyle(0xAED581, 1);
+        graphics.fillEllipse(0, -28 * scale + contentY, 10 * scale, 16 * scale);
+        // 叶子高光
+        graphics.fillStyle(0xFFFFFF, 0.25);
+        graphics.fillEllipse(-18 * scale, -18 * scale + contentY, 10 * scale, 5 * scale);
+        graphics.fillEllipse(18 * scale, -13 * scale + contentY, 10 * scale, 5 * scale);
+        break;
+
+      case 'small_tree':
+        // 草地
+        graphics.fillStyle(0x81C784, 1);
+        graphics.fillRect(-40 * scale, 25 * scale + contentY, 80 * scale, 20 * scale);
+        // 树干
+        graphics.fillStyle(0x795548, 1);
+        graphics.fillRect(-6 * scale, 0 + contentY, 12 * scale, 30 * scale);
+        // 树干纹理
+        graphics.lineStyle(1.5 * scale, 0x5D4037, 0.5);
+        graphics.lineBetween(-4 * scale, 5 * scale + contentY, -2 * scale, 25 * scale + contentY);
+        graphics.lineBetween(3 * scale, 8 * scale + contentY, 4 * scale, 22 * scale + contentY);
+        // 小树冠
+        graphics.fillStyle(color, 1);
+        graphics.fillCircle(0, -18 * scale + contentY, 30 * scale);
+        // 树冠层次
+        graphics.fillStyle(0x4CAF50, 1);
+        graphics.fillCircle(-12 * scale, -10 * scale + contentY, 18 * scale);
+        graphics.fillCircle(12 * scale, -12 * scale + contentY, 16 * scale);
+        // 树叶高光
+        graphics.fillStyle(0xA5D6A7, 0.5);
+        graphics.fillCircle(-8 * scale, -25 * scale + contentY, 10 * scale);
+        // 小苹果
+        graphics.fillStyle(0xFF6B6B, 1);
+        graphics.fillCircle(15 * scale, -8 * scale + contentY, 6 * scale);
+        break;
+
+      case 'big_tree':
+        // 草地
+        graphics.fillStyle(0x81C784, 1);
+        graphics.fillRect(-40 * scale, 28 * scale + contentY, 80 * scale, 18 * scale);
+        // 粗树干
+        graphics.fillStyle(0x795548, 1);
+        graphics.fillRect(-10 * scale, 0 + contentY, 20 * scale, 35 * scale);
+        // 树枝
+        graphics.fillStyle(0x6D4C41, 1);
+        graphics.fillRect(-30 * scale, -5 * scale + contentY, 25 * scale, 6 * scale);
+        graphics.fillRect(5 * scale, -8 * scale + contentY, 28 * scale, 6 * scale);
+        // 树干纹理
+        graphics.lineStyle(2 * scale, 0x5D4037, 0.5);
+        graphics.lineBetween(-6 * scale, 5 * scale + contentY, -4 * scale, 30 * scale + contentY);
+        graphics.lineBetween(5 * scale, 8 * scale + contentY, 6 * scale, 28 * scale + contentY);
+        // 大树冠
+        graphics.fillStyle(color, 1);
+        graphics.fillCircle(0, -22 * scale + contentY, 38 * scale);
+        graphics.fillCircle(-22 * scale, -12 * scale + contentY, 22 * scale);
+        graphics.fillCircle(22 * scale, -15 * scale + contentY, 24 * scale);
+        // 树冠层次
+        graphics.fillStyle(0x2E7D32, 1);
+        graphics.fillCircle(-15 * scale, -28 * scale + contentY, 18 * scale);
+        graphics.fillCircle(12 * scale, -30 * scale + contentY, 16 * scale);
+        // 苹果
+        graphics.fillStyle(0xFF0000, 1);
+        graphics.fillCircle(-20 * scale, -15 * scale + contentY, 6 * scale);
+        graphics.fillCircle(18 * scale, -20 * scale + contentY, 6 * scale);
+        graphics.fillCircle(5 * scale, -8 * scale + contentY, 5 * scale);
+        // 鸟巢
+        graphics.fillStyle(0xA1887F, 1);
+        graphics.fillEllipse(-25 * scale, -5 * scale + contentY, 14 * scale, 8 * scale);
+        // 小鸟
+        graphics.fillStyle(0xFFEB3B, 1);
+        graphics.fillCircle(-25 * scale, -12 * scale + contentY, 6 * scale);
+        graphics.fillStyle(0xFF9800, 1);
+        graphics.fillTriangle(-20 * scale, -12 * scale + contentY, -17 * scale, -10 * scale + contentY, -20 * scale, -10 * scale + contentY);
+        break;
+
+      // ===== 雪人 =====
+      case 'snow':
+        // 冬天蓝天
+        graphics.fillStyle(0x87CEEB, 1);
+        graphics.fillRect(-40 * scale, -30 * scale + contentY, 80 * scale, 75 * scale);
+        // 雪地
+        graphics.fillStyle(0xFFFFFF, 1);
+        graphics.fillRect(-40 * scale, 25 * scale + contentY, 80 * scale, 20 * scale);
+        graphics.fillStyle(0xE8E8E8, 1);
+        graphics.fillEllipse(-20 * scale, 28 * scale + contentY, 25 * scale, 10 * scale);
+        graphics.fillEllipse(20 * scale, 30 * scale + contentY, 20 * scale, 8 * scale);
+        // 飘落的雪花 - 六角形
+        graphics.fillStyle(color, 1);
+        for (let i = 0; i < 8; i++) {
+          const sx = (-35 + i * 10) * scale;
+          const sy = (-25 + (i % 3) * 18) * scale + contentY;
+          const size = (4 + i % 3) * scale;
+          graphics.fillCircle(sx, sy, size);
+          // 雪花装饰线
+          graphics.lineStyle(1 * scale, color, 0.8);
+          for (let j = 0; j < 6; j++) {
+            const angle = (j / 6) * Math.PI * 2;
+            graphics.lineBetween(sx, sy, sx + Math.cos(angle) * size * 1.5, sy + Math.sin(angle) * size * 1.5);
+          }
+        }
+        // 白云
+        graphics.fillStyle(0xFFFFFF, 0.8);
+        graphics.fillCircle(-25 * scale, -25 * scale + contentY, 12 * scale);
+        graphics.fillCircle(-12 * scale, -28 * scale + contentY, 10 * scale);
+        graphics.fillCircle(25 * scale, -22 * scale + contentY, 14 * scale);
+        break;
+
+      case 'ball1':
+        // 蓝天
+        graphics.fillStyle(0x87CEEB, 1);
+        graphics.fillRect(-40 * scale, -30 * scale + contentY, 80 * scale, 75 * scale);
+        // 雪地
+        graphics.fillStyle(0xFFFFFF, 1);
+        graphics.fillRect(-40 * scale, 20 * scale + contentY, 80 * scale, 25 * scale);
+        // 雪球
+        graphics.fillStyle(color, 1);
+        graphics.fillCircle(15 * scale, 12 * scale + contentY, 22 * scale);
+        // 雪球阴影
+        graphics.fillStyle(0xD0D0D0, 0.5);
+        graphics.fillEllipse(15 * scale, 28 * scale + contentY, 25 * scale, 8 * scale);
+        // 雪球高光
+        graphics.fillStyle(0xFFFFFF, 0.6);
+        graphics.fillCircle(8 * scale, 4 * scale + contentY, 8 * scale);
+        // 可爱小朋友的手（简化）
+        graphics.fillStyle(0xFFB6C1, 1);
+        graphics.fillCircle(-12 * scale, 8 * scale + contentY, 10 * scale);
+        graphics.fillStyle(0xFF69B4, 1);
+        graphics.fillRoundedRect(-22 * scale, 0 + contentY, 15 * scale, 25 * scale, 5);
+        // 飘落雪花
+        graphics.fillStyle(0xFFFFFF, 0.8);
+        graphics.fillCircle(-30 * scale, -15 * scale + contentY, 4 * scale);
+        graphics.fillCircle(-5 * scale, -22 * scale + contentY, 3 * scale);
+        graphics.fillCircle(28 * scale, -18 * scale + contentY, 5 * scale);
+        break;
+
+      case 'ball2':
+        // 蓝天
+        graphics.fillStyle(0x87CEEB, 1);
+        graphics.fillRect(-40 * scale, -30 * scale + contentY, 80 * scale, 75 * scale);
+        // 雪地
+        graphics.fillStyle(0xFFFFFF, 1);
+        graphics.fillRect(-40 * scale, 28 * scale + contentY, 80 * scale, 18 * scale);
+        // 底部大雪球
+        graphics.fillStyle(color, 1);
+        graphics.fillCircle(0, 18 * scale + contentY, 25 * scale);
+        // 顶部小雪球
+        graphics.fillStyle(0xF5F5F5, 1);
+        graphics.fillCircle(0, -12 * scale + contentY, 20 * scale);
+        // 雪球高光
+        graphics.fillStyle(0xFFFFFF, 0.6);
+        graphics.fillCircle(-8 * scale, 10 * scale + contentY, 8 * scale);
+        graphics.fillCircle(-6 * scale, -18 * scale + contentY, 6 * scale);
+        // 阴影
+        graphics.fillStyle(0xD0D0D0, 0.4);
+        graphics.fillEllipse(0, 38 * scale + contentY, 30 * scale, 8 * scale);
+        // 飘落雪花
+        graphics.fillStyle(0xFFFFFF, 0.8);
+        graphics.fillCircle(-32 * scale, -10 * scale + contentY, 4 * scale);
+        graphics.fillCircle(28 * scale, -20 * scale + contentY, 3 * scale);
+        break;
+
+      case 'snowman':
+        // 蓝天
+        graphics.fillStyle(color, 1);
+        graphics.fillRect(-40 * scale, -35 * scale + contentY, 80 * scale, 80 * scale);
+        // 雪地
+        graphics.fillStyle(0xFFFFFF, 1);
+        graphics.fillRect(-40 * scale, 30 * scale + contentY, 80 * scale, 15 * scale);
+        // 底部大雪球
+        graphics.fillStyle(0xFFFFFF, 1);
+        graphics.fillCircle(0, 22 * scale + contentY, 22 * scale);
+        // 中间雪球
+        graphics.fillStyle(0xFAFAFA, 1);
+        graphics.fillCircle(0, -2 * scale + contentY, 17 * scale);
+        // 顶部小雪球 - 头
+        graphics.fillStyle(0xFFFFFF, 1);
+        graphics.fillCircle(0, -22 * scale + contentY, 14 * scale);
+        // 雪球高光
+        graphics.fillStyle(0xFFFFFF, 0.8);
+        graphics.fillCircle(-6 * scale, 15 * scale + contentY, 6 * scale);
+        graphics.fillCircle(-5 * scale, -6 * scale + contentY, 5 * scale);
+        graphics.fillCircle(-4 * scale, -26 * scale + contentY, 4 * scale);
+        // 帽子
+        graphics.fillStyle(0x2F4F4F, 1);
+        graphics.fillRect(-12 * scale, -42 * scale + contentY, 24 * scale, 14 * scale);
+        graphics.fillRect(-16 * scale, -30 * scale + contentY, 32 * scale, 5 * scale);
+        // 眼睛
+        graphics.fillStyle(0x000000, 1);
+        graphics.fillCircle(-5 * scale, -24 * scale + contentY, 3 * scale);
+        graphics.fillCircle(5 * scale, -24 * scale + contentY, 3 * scale);
+        // 胡萝卜鼻子
+        graphics.fillStyle(0xFF6B00, 1);
+        graphics.fillTriangle(0, -20 * scale + contentY, 0, -16 * scale + contentY, 12 * scale, -18 * scale + contentY);
+        // 微笑
+        graphics.lineStyle(2 * scale, 0x000000, 1);
+        graphics.beginPath();
+        graphics.arc(0, -16 * scale + contentY, 6 * scale, 0.3, Math.PI - 0.3);
+        graphics.strokePath();
+        // 围巾
+        graphics.fillStyle(0xFF0000, 1);
+        graphics.fillRect(-18 * scale, -10 * scale + contentY, 36 * scale, 6 * scale);
+        graphics.fillRect(15 * scale, -10 * scale + contentY, 8 * scale, 20 * scale);
+        // 纽扣
+        graphics.fillStyle(0x000000, 1);
+        graphics.fillCircle(0, 2 * scale + contentY, 3 * scale);
+        graphics.fillCircle(0, 12 * scale + contentY, 3 * scale);
+        // 树枝手臂
+        graphics.fillStyle(0x5D4037, 1);
+        graphics.fillRect(-35 * scale, -5 * scale + contentY, 20 * scale, 4 * scale);
+        graphics.fillRect(15 * scale, -3 * scale + contentY, 22 * scale, 4 * scale);
         break;
 
       // ===== 下雨彩虹 =====
       case 'cloud':
-        // 乌云
+        // 深色天空
+        graphics.fillStyle(0x546E7A, 1);
+        graphics.fillRect(-40 * scale, -28 * scale + contentY, 80 * scale, 70 * scale);
+        // 乌云 - 层次感
+        graphics.fillStyle(0x455A64, 1);
+        graphics.fillCircle(-18 * scale, -5 * scale + contentY, 22 * scale);
+        graphics.fillCircle(18 * scale, -3 * scale + contentY, 24 * scale);
+        graphics.fillCircle(0, -15 * scale + contentY, 28 * scale);
         graphics.fillStyle(color, 1);
-        graphics.fillCircle(-15 * scale, contentY, 20 * scale);
-        graphics.fillCircle(15 * scale, contentY, 22 * scale);
-        graphics.fillCircle(0, -10 * scale + contentY, 25 * scale);
-        graphics.fillCircle(-25 * scale, 5 * scale + contentY, 15 * scale);
-        graphics.fillCircle(25 * scale, 3 * scale + contentY, 16 * scale);
+        graphics.fillCircle(-28 * scale, 2 * scale + contentY, 16 * scale);
+        graphics.fillCircle(28 * scale, 0 + contentY, 18 * scale);
+        graphics.fillCircle(0, -8 * scale + contentY, 22 * scale);
         // 闪电
-        graphics.fillStyle(0xffff00, 1);
+        graphics.fillStyle(0xFFEB3B, 1);
         graphics.beginPath();
-        graphics.moveTo(0, 15 * scale + contentY);
-        graphics.lineTo(-8 * scale, 28 * scale + contentY);
-        graphics.lineTo(0, 25 * scale + contentY);
-        graphics.lineTo(-5 * scale, 40 * scale + contentY);
-        graphics.lineTo(5 * scale, 22 * scale + contentY);
-        graphics.lineTo(0, 26 * scale + contentY);
-        graphics.lineTo(8 * scale, 15 * scale + contentY);
+        graphics.moveTo(-2 * scale, 12 * scale + contentY);
+        graphics.lineTo(-10 * scale, 25 * scale + contentY);
+        graphics.lineTo(-2 * scale, 22 * scale + contentY);
+        graphics.lineTo(-8 * scale, 38 * scale + contentY);
+        graphics.lineTo(4 * scale, 20 * scale + contentY);
+        graphics.lineTo(-2 * scale, 24 * scale + contentY);
+        graphics.lineTo(6 * scale, 12 * scale + contentY);
         graphics.closePath();
         graphics.fillPath();
+        // 闪电高光
+        graphics.fillStyle(0xFFF9C4, 0.6);
+        graphics.fillTriangle(-4 * scale, 15 * scale + contentY, -6 * scale, 22 * scale + contentY, 0, 18 * scale + contentY);
         break;
 
       case 'rain':
-        // 云
-        graphics.fillStyle(0x808080, 1);
-        graphics.fillCircle(-12 * scale, -15 * scale + contentY, 18 * scale);
-        graphics.fillCircle(12 * scale, -15 * scale + contentY, 20 * scale);
-        graphics.fillCircle(0, -22 * scale + contentY, 22 * scale);
-        // 雨滴
+        // 灰色天空
+        graphics.fillStyle(0x78909C, 1);
+        graphics.fillRect(-40 * scale, -28 * scale + contentY, 80 * scale, 70 * scale);
+        // 雨云
+        graphics.fillStyle(0x607D8B, 1);
+        graphics.fillCircle(-15 * scale, -18 * scale + contentY, 20 * scale);
+        graphics.fillCircle(15 * scale, -16 * scale + contentY, 22 * scale);
+        graphics.fillCircle(0, -25 * scale + contentY, 24 * scale);
+        graphics.fillCircle(-28 * scale, -12 * scale + contentY, 14 * scale);
+        graphics.fillCircle(28 * scale, -10 * scale + contentY, 15 * scale);
+        // 雨滴 - 可爱的水滴形状
         graphics.fillStyle(color, 1);
-        for (let i = 0; i < 5; i++) {
-          const rx = -25 * scale + i * 12 * scale;
-          const ry = 8 * scale + (i % 2) * 12 * scale + contentY;
-          graphics.fillEllipse(rx, ry, 4 * scale, 10 * scale);
+        for (let i = 0; i < 6; i++) {
+          const rx = -28 * scale + i * 11 * scale;
+          const ry = 5 * scale + (i % 2) * 15 * scale + contentY;
+          // 水滴形状
+          graphics.fillCircle(rx, ry + 4 * scale, 5 * scale);
+          graphics.fillTriangle(rx - 5 * scale, ry + 4 * scale, rx + 5 * scale, ry + 4 * scale, rx, ry - 6 * scale);
         }
+        // 水花
+        graphics.fillStyle(0x90CAF9, 0.6);
+        graphics.fillCircle(-20 * scale, 32 * scale + contentY, 4 * scale);
+        graphics.fillCircle(15 * scale, 35 * scale + contentY, 3 * scale);
         break;
 
       case 'rainbow':
-        // 天空
-        graphics.fillStyle(0x87ceeb, 0.4);
-        graphics.fillRect(-40 * scale, -25 * scale + contentY, 80 * scale, 65 * scale);
-        // 彩虹
-        const rainbowColors = [0xff0000, 0xff7f00, 0xffff00, 0x00ff00, 0x0000ff, 0x8b00ff];
+        // 蓝天
+        graphics.fillStyle(0x64B5F6, 1);
+        graphics.fillRect(-40 * scale, -28 * scale + contentY, 80 * scale, 70 * scale);
+        // 草地
+        graphics.fillStyle(0x81C784, 1);
+        graphics.fillRect(-40 * scale, 30 * scale + contentY, 80 * scale, 15 * scale);
+        // 彩虹 - 更精致
+        const rainbowColors = [0xF44336, 0xFF9800, 0xFFEB3B, 0x4CAF50, 0x2196F3, 0x9C27B0];
         for (let i = 0; i < rainbowColors.length; i++) {
-          graphics.lineStyle(5 * scale, rainbowColors[i], 0.8);
+          graphics.lineStyle(5 * scale, rainbowColors[i], 0.9);
           graphics.beginPath();
-          graphics.arc(0, 30 * scale + contentY, (35 - i * 5) * scale, Math.PI, 0);
+          graphics.arc(0, 35 * scale + contentY, (38 - i * 5) * scale, Math.PI, 0);
           graphics.strokePath();
         }
-        // 太阳
-        graphics.fillStyle(0xffd700, 1);
-        graphics.fillCircle(25 * scale, -15 * scale + contentY, 12 * scale);
+        // 可爱的太阳
+        graphics.fillStyle(0xFFEB3B, 1);
+        graphics.fillCircle(28 * scale, -15 * scale + contentY, 14 * scale);
+        // 太阳光芒
+        graphics.fillStyle(0xFFD54F, 0.7);
+        for (let i = 0; i < 6; i++) {
+          const angle = (i / 6) * Math.PI * 2;
+          graphics.fillTriangle(
+            28 * scale, -15 * scale + contentY,
+            28 * scale + Math.cos(angle) * 20 * scale, -15 * scale + Math.sin(angle) * 20 * scale + contentY,
+            28 * scale + Math.cos(angle + 0.3) * 20 * scale, -15 * scale + Math.sin(angle + 0.3) * 20 * scale + contentY
+          );
+        }
+        // 小花
+        graphics.fillStyle(0xFFEB3B, 1);
+        graphics.fillCircle(-30 * scale, 35 * scale + contentY, 4 * scale);
+        graphics.fillStyle(0xFF69B4, 1);
+        graphics.fillCircle(-18 * scale, 38 * scale + contentY, 3 * scale);
+        graphics.fillCircle(25 * scale, 36 * scale + contentY, 4 * scale);
         break;
 
       // ===== 默认图形 - 更美观 =====
