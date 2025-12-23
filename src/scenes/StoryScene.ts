@@ -610,7 +610,7 @@ export class StoryScene extends Phaser.Scene {
 
     // 卡片内容
     const content = this.add.graphics();
-    this.drawCardContent(content, type, color, cardWidth, container);
+    const cardImage = this.drawCardContent(content, type, color, cardWidth); // 获取返回的图片
 
     // 中文标签背景
     const labelBg = this.add.graphics();
@@ -632,7 +632,14 @@ export class StoryScene extends Phaser.Scene {
     });
     labelText.setOrigin(0.5);
 
+    // 先添加基础元素
     container.add([shadow, bg, deco, content, labelBg, labelText]);
+
+    // 如果有图片，最后添加确保在最上层
+    if (cardImage) {
+      container.add(cardImage);
+    }
+
     container.setDepth(1);
 
     const hitArea = new Phaser.Geom.Rectangle(-cardWidth / 2, -cardHeight / 2, cardWidth, cardHeight);
@@ -678,7 +685,7 @@ export class StoryScene extends Phaser.Scene {
     return card;
   }
 
-  private drawCardContent(graphics: Phaser.GameObjects.Graphics, type: string, color: number, cardWidth: number, container?: Phaser.GameObjects.Container): void {
+  private drawCardContent(graphics: Phaser.GameObjects.Graphics, type: string, color: number, cardWidth: number): Phaser.GameObjects.Image | null {
     const scale = cardWidth / 160;
     const contentY = -15 * scale; // 向上偏移，为标签留空间
 
@@ -690,13 +697,12 @@ export class StoryScene extends Phaser.Scene {
     const themeName = this.currentTheme.name;
     const imageKey = STORY_IMAGES[themeName]?.[type];
 
-    if (imageKey && this.textures.exists(imageKey) && container) {
-      // 使用图片渲染
+    if (imageKey && this.textures.exists(imageKey)) {
+      // 创建图片但不添加到 container，返回给调用者来控制添加顺序
       const imageSize = (cardWidth - 40) * 0.85;
       const image = this.add.image(0, contentY, imageKey);
       image.setDisplaySize(imageSize, imageSize);
-      container.add(image);
-      return; // 使用图片后直接返回，不执行代码绘制
+      return image; // 返回图片对象，让调用者最后添加确保在最上层
     }
 
     // 以下是代码绘制逻辑（当没有图片资源时使用）
@@ -2016,6 +2022,8 @@ export class StoryScene extends Phaser.Scene {
         }
         break;
     }
+
+    return null; // 代码绘制时返回 null
   }
 
   private checkDropOnSlot(card: StoryCard): void {

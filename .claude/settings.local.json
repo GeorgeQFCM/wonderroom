@@ -38,7 +38,9 @@
       "WebFetch(domain:www.gameart2d.com)",
       "WebFetch(domain:openclipart.org)",
       "WebFetch(domain:craftpix.net)",
-      "WebFetch(domain:game-icons.net)"
+      "WebFetch(domain:game-icons.net)",
+      "Bash(done)",
+      "Bash(find /Users/zhuang/Desktop/AI_Project/WonderRoomH5_2/public/assets/story -name \"*.png\" -exec basename {} ;)"
     ]
   },
   "outputStyle": "default"

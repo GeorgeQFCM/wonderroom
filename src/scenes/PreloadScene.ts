@@ -138,7 +138,7 @@ export class PreloadScene extends Phaser.Scene {
     this.load.image('story_rain_rainbow', 'assets/story/rain/rainbow.png');
 
     // 树木生长
-    this.load.image('story_tree_seed', 'assets/story/tree/seed.png');
+    this.load.image('story_tree_seed', 'assets/story/tree/seed2.png');
     this.load.image('story_tree_sapling', 'assets/story/tree/sapling.png');
     this.load.image('story_tree_small', 'assets/story/tree/small_tree.png');
     this.load.image('story_tree_big', 'assets/story/tree/big_tree.png');
@@ -177,8 +177,8 @@ export class PreloadScene extends Phaser.Scene {
     // 水循环
     this.load.image('story_water_ocean', 'assets/story/water_cycle/ocean.png');
     this.load.image('story_water_evaporate', 'assets/story/water_cycle/evaporate.png');
-    this.load.image('story_water_cloud', 'assets/story/water_cycle/cloud.png');
-    this.load.image('story_water_rain', 'assets/story/water_cycle/rain.png');
+    this.load.image('story_water_cloud', 'assets/story/water_cycle/cloud2.png');
+    this.load.image('story_water_rain', 'assets/story/water_cycle/rain2.png');
     this.load.image('story_water_river', 'assets/story/water_cycle/river.png');
   }
 
